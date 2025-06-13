@@ -37,7 +37,6 @@ import {
 import axios from 'axios';
 import { API_ROUTES, BACKEND_URL } from '../services/api';
 import { useUser } from '../UserContext';
-import NewProjectModal from '../components/NewProjectModal';
 import ProjectModal from '../components/ProjectModal';
 import FlashcardDisplay from '../components/FlashcardDisplay';
 import ConfirmationModal from '../components/ConfirmationModal';
@@ -47,6 +46,7 @@ import ProjectHeader from '../components/ProjectHeader';
 import ProjectNavigation from '../components/ProjectNavigation';
 import ProjectGrid from '../components/ProjectGrid';
 import ProjectContent from '../components/ProjectContent';
+import Toast from '../components/Toast';
 
 export default function StudyBuddyDashboard() {
   const { user, loading, logout } = useUser();
@@ -86,6 +86,8 @@ export default function StudyBuddyDashboard() {
   const [projectToDelete, setProjectToDelete] = useState(null);
 
   const [activeTab, setActiveTab] = useState('overview');
+
+  const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
 
   const navigate = useNavigate();
 
@@ -229,17 +231,6 @@ export default function StudyBuddyDashboard() {
     }
   };
 
- 
-  //   if (!chatInput.trim()) return;
-    
-  //   setChatMessages(prev => [
-  //     ...prev,
-  //     { type: 'user', message: chatInput },
-  //     { type: 'bot', message: 'Great question! Let me help you understand this concept better. Based on your study material, here\'s what I can explain...' }
-  //   ]);
-  //   setChatInput('');
-  // };
-
   const createNewProject = async (title, description) => {
     try {
       const token = localStorage.getItem('token');
@@ -260,17 +251,30 @@ export default function StudyBuddyDashboard() {
     }
   };
 
+  const showToast = (message, type = 'info') => {
+    setToast({ show: true, message, type });
+    setTimeout(() => {
+      setToast({ show: false, message: '', type: 'info' });
+    }, 5000);
+  };
+
   const generateAIContent = async (contentType) => {
-    if (!selectedProject || !selectedProject.extractedTextContent) {
-      alert("Please select a project and upload materials first.");
+    if (!selectedProject) {
+      showToast('Please select a project first.', 'error');
       return;
     }
+
+    if (!selectedProject.extractedTextContent) {
+      showToast('Please upload study materials before generating content.', 'error');
+      return;
+    }
+
     setAiLoading(true);
     // Clear previous content state for the current type before generating new one
     switch (contentType) {
         case 'study-plan': 
           setStudyPlanContent(null); 
-          setStudyPlanId(null); // Also clear the study plan ID
+          setStudyPlanId(null);
           break;
         case 'flashcards': setFlashcardsContent(null); break;
         case 'qa': setQaContent(null); break;
@@ -284,40 +288,44 @@ export default function StudyBuddyDashboard() {
       const payload = {
         projectId: selectedProject._id,
         contentInput: selectedProject.extractedTextContent,
-        projectName: selectedProject.title, // Pass project name for context
-        projectDescription: selectedProject.description // Pass project description
+        projectName: selectedProject.title,
+        projectDescription: selectedProject.description
       };
 
       let response;
       switch (contentType) {
         case 'study-plan':
           response = await axios.post(API_ROUTES.AI_GENERATE.STUDY_PLAN, payload, { headers: { Authorization: `Bearer ${token}` } });
-          // Make sure we're setting the content array, not the whole study plan object
           setStudyPlanContent(response.data.data.content || []);
           setStudyPlanId(response.data.data._id);
+          showToast('Study plan generated successfully!', 'success');
           break;
         case 'flashcards':
           response = await axios.post(API_ROUTES.AI_GENERATE.FLASHCARDS, payload, { headers: { Authorization: `Bearer ${token}` } });
           setFlashcardsContent(response.data.data.content);
+          showToast('Flashcards generated successfully!', 'success');
           break;
         case 'qa':
           response = await axios.post(API_ROUTES.AI_GENERATE.QA, payload, { headers: { Authorization: `Bearer ${token}` } });
           setQaContent(response.data.data.content);
+          showToast('Q&A generated successfully!', 'success');
           break;
         case 'roadmap':
           response = await axios.post(API_ROUTES.AI_GENERATE.ROADMAP, payload, { headers: { Authorization: `Bearer ${token}` } });
           setRoadmapContent(response.data.data.content);
+          showToast('Roadmap generated successfully!', 'success');
           break;
         case 'slides':
           response = await axios.post(API_ROUTES.AI_GENERATE.SLIDES, payload, { headers: { Authorization: `Bearer ${token}` } });
           setSlidesContent(response.data.data.content);
+          showToast('Slides generated successfully!', 'success');
           break;
         default:
           break;
       }
     } catch (error) {
       console.error(`Error generating ${contentType}:`, error);
-      // Handle error, show message to user
+      showToast(`Failed to generate ${contentType}. Please try again.`, 'error');
     } finally {
       setAiLoading(false);
     }
@@ -439,7 +447,7 @@ export default function StudyBuddyDashboard() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showProjectDropdownId]);
 
-          return (
+  return (
     <div className="min-h-screen bg-gray-50">
       <AppHeader user={user} logout={logout} />
       <main className="container mx-auto px-6 py-8">
@@ -493,16 +501,16 @@ export default function StudyBuddyDashboard() {
       </main>
 
       {showNewProjectModal && (
-        <NewProjectModal 
+        <ProjectModal 
           onClose={() => setShowNewProjectModal(false)}
-          onCreateProject={createNewProject}
+          onSave={createNewProject}
+          isEdit={false}
         />
       )}
 
       {/* Edit Project Modal */}
       {showEditProjectModal && projectToEdit && (
         <ProjectModal
-          isOpen={showEditProjectModal}
           onClose={() => setShowEditProjectModal(false)}
           onSave={handleUpdateProject}
           initialTitle={projectToEdit.title}
@@ -544,6 +552,15 @@ export default function StudyBuddyDashboard() {
 
       {/* AI Tutor Chatbot */}
       <RenderChatbot />
+
+      {/* Toast Component */}
+      {toast.show && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast({ show: false, message: '', type: 'info' })}
+        />
+      )}
 
       <style jsx>{`
         .animate-fade-in {

@@ -191,77 +191,196 @@ const ProjectContent = ({
         </div>
       );
 
-    case 'upload':
-      return (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6">Upload Study Materials</h2>
-            
-            <div 
-              onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer"
-            >
-              {isUploading ? (
-                <div className="space-y-4">
-                  <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600">Uploading...</p>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${uploadProgress}%` }}
-                      ></div>
+      case 'upload':
+        return (
+          <div className="space-y-8">
+            {/* Upload Section */}
+            <div className="bg-gradient-to-br from-white via-blue-50/30 to-blue-50/30 rounded-2xl shadow-xl border border-white/50 backdrop-blur-sm p-8 relative overflow-hidden">
+              {/* Background Pattern */}
+              <div className="absolute inset-0 opacity-5">
+                <div className="absolute top-0 left-0 w-40 h-40 bg-blue-500 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 right-0 w-32 h-32 bg-blue-400 rounded-full blur-3xl"></div>
+              </div>
+              
+              <div className="relative">
+                <div className="flex items-center space-x-3 mb-8">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <Upload className="w-5 h-5 text-white" />
+                  </div>
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                    Upload Study Materials
+                  </h2>
+                </div>
+      
+                {/* Upload Drop Zone */}
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`relative group border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-500 cursor-pointer overflow-hidden ${
+                    isUploading 
+                      ? 'border-blue-400 bg-blue-50/50' 
+                      : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50/30 hover:shadow-lg hover:scale-[1.02]'
+                  }`}
+                >
+                  {/* Animated Background Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-blue-400/5 to-blue-300/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  
+                  {isUploading ? (
+                    <div className="relative space-y-6">
+                      {/* Animated Upload Icon */}
+                      <div className="relative">
+                        <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-2xl">
+                          <Upload className="w-8 h-8 text-white animate-bounce" />
+                        </div>
+                        <div className="absolute inset-0 w-20 h-20 mx-auto border-4 border-blue-200 rounded-2xl animate-ping"></div>
+                      </div>
+                      
+                      <div className="space-y-4">
+                        <p className="text-lg font-semibold text-blue-600">Processing your files...</p>
+                        <p className="text-sm text-gray-600">Please wait while we analyze your study materials</p>
+                        
+                        {/* Modern Progress Bar */}
+                        <div className="max-w-xs mx-auto">
+                          <div className="flex justify-between text-xs text-gray-500 mb-2">
+                            <span>Progress</span>
+                            <span>{uploadProgress}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                            <div
+                              className="h-3 rounded-full bg-gradient-to-r from-blue-500 via-blue-400 to-blue-300 transition-all duration-500 relative overflow-hidden"
+                              style={{ width: `${uploadProgress}%` }}
+                            >
+                              <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="relative space-y-6">
+                      {/* Upload Icon with Animation */}
+                      <div className="relative">
+                        <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg group-hover:shadow-xl">
+                          <Upload className="w-8 h-8 text-blue-600 group-hover:text-blue-700 transition-colors duration-300" />
+                        </div>
+                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-0 group-hover:scale-100">
+                          <span className="text-white text-xs font-bold">+</span>
+                        </div>
+                      </div>
+      
+                      <div className="space-y-3">
+                        <h3 className="text-xl font-bold text-gray-800 group-hover:text-gray-900 transition-colors">
+                          Drop your PDF files here or click to browse
+                        </h3>
+                        <p className="text-gray-600 group-hover:text-gray-700 transition-colors">
+                          PDF files only • Max 50MB per file
+                        </p>
+                      </div>
+      
+                      {/* PDF Format Badge */}
+                      <div className="flex justify-center pt-4">
+                        <div className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-full shadow-lg opacity-70 group-hover:opacity-100 transition-all duration-300 group-hover:scale-105">
+                          📄 PDF Only
+                        </div>
+                      </div>
+      
+                      <button 
+                        type="button" 
+                        className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                      >
+                        Choose Files
+                      </button>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  <Upload className="w-16 h-16 text-gray-400 mx-auto" />
-                  <div>
-                    <p className="text-lg font-medium text-gray-700">Upload your study materials</p>
-                    <p className="text-sm text-gray-500 mt-1">PDF, DOC, PPT files supported • Max 50MB</p>
-                  </div>
-                  <button type="button" className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                    Choose Files
-                  </button>
-                </div>
-              )}
+      
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept=".pdf"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </div>
             </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              accept=".pdf,.doc,.docx,.ppt,.pptx"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
-            
+      
+            {/* Uploaded Files Section */}
             {selectedProject?.uploadedFiles?.length > 0 && (
-              <div className="mt-8">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Uploaded Files</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                      <FileText className="w-4 h-4 text-white" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900">Your Study Materials</h3>
+                  </div>
+                  <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                    {selectedProject.uploadedFiles.length} file{selectedProject.uploadedFiles.length !== 1 ? 's' : ''}
+                  </div>
+                </div>
+      
+                {/* Files Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {selectedProject.uploadedFiles.map((file, index) => (
-                    <div 
-                      key={index} 
-                      className="bg-gray-50 p-4 rounded-lg border border-gray-200 cursor-pointer hover:shadow-md transition-shadow"
+                    <div
+                      key={index}
+                      className="group bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 hover:border-blue-200"
                       onClick={() => {
                         setPdfUrlToView(`${BACKEND_URL}/uploads/${encodeURIComponent(file.filePath)}`);
                         setShowPdfViewer(true);
                       }}
                     >
-                      <div className="flex items-center space-x-3">
-                        <FileText className="w-6 h-6 text-blue-500" />
-                        <span className="font-medium text-gray-800 break-all">{file.fileName}</span>
+                      {/* PDF Header */}
+                      <div className="h-2 bg-gradient-to-r from-blue-500 to-blue-600"></div>
+                      
+                      <div className="p-6">
+                        {/* PDF Icon */}
+                        <div className="flex items-start space-x-4 mb-4">
+                          <div className="w-12 h-12 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md">
+                            <FileText className="w-6 h-6 text-blue-600" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="inline-block px-2 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-bold rounded-md mb-2">
+                              PDF
+                            </div>
+                            <h4 className="font-semibold text-gray-900 text-sm leading-tight group-hover:text-blue-600 transition-colors line-clamp-2">
+                              {file.fileName}
+                            </h4>
+                          </div>
+                        </div>
+      
+                        {/* File Info */}
+                        <div className="space-y-2 text-xs text-gray-500">
+                          <div className="flex items-center justify-between">
+                            <span>Uploaded</span>
+                            <span className="font-medium">{new Date(file.uploadDate).toLocaleDateString()}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span>Status</span>
+                            <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 rounded-full">
+                              <div className="w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></div>
+                              Ready
+                            </span>
+                          </div>
+                        </div>
+      
+                        {/* View Button */}
+                        <div className="mt-4 pt-4 border-t border-gray-100">
+                          <div className="flex items-center justify-center space-x-2 text-blue-600 group-hover:text-blue-700 transition-colors">
+                            <span className="text-sm font-medium">Click to view</span>
+                            <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">Uploaded: {new Date(file.uploadDate).toLocaleDateString()}</p>
                     </div>
                   ))}
                 </div>
               </div>
             )}
           </div>
-        </div>
-      );
+        );
 
       case 'study-plan':
         return (
@@ -292,7 +411,7 @@ const ProjectContent = ({
                 {/* Tree Structure Container */}
                 <div className="relative flex flex-col items-center space-y-8">
                   {/* Vertical Line - Main Tree Trunk */}
-                  <div className="absolute left-1/2 top-0 w-1 bg-gradient-to-b from-blue-200 via-purple-200 to-green-200 transform -translate-x-1/2 h-full"></div>
+                  <div className="absolute left-1/2 top-0 w-1 bg-gradient-to-b from-blue-200 via-blue-300 to-blue-400 transform -translate-x-1/2 h-full"></div>
                   
                   {studyPlanContent.map((phase, index) => (
                     <div key={index} className="relative w-full max-w-6xl">
@@ -364,7 +483,7 @@ const ProjectContent = ({
                               <div className="space-y-4">
                                 {/* Objectives */}
                                 {phase.objectives && phase.objectives.length > 0 && (
-                                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3">
+                                  <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3">
                                     <h4 className="text-sm font-semibold text-blue-800 mb-2 flex items-center">
                                       <Target className="w-4 h-4 mr-2" />
                                       Learning Objectives
@@ -382,14 +501,14 @@ const ProjectContent = ({
   
                                 {/* Topics */}
                                 {phase.topics && phase.topics.length > 0 && (
-                                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-3">
-                                    <h4 className="text-sm font-semibold text-purple-800 mb-2 flex items-center">
+                                  <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3">
+                                    <h4 className="text-sm font-semibold text-blue-800 mb-2 flex items-center">
                                       <Brain className="w-4 h-4 mr-2" />
                                       Topics
                                     </h4>
                                     <div className="flex flex-wrap gap-2">
                                       {phase.topics.map((topic, idx) => (
-                                        <span key={idx} className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full font-medium">
+                                        <span key={idx} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full font-medium">
                                           {topic}
                                         </span>
                                       ))}
@@ -399,15 +518,15 @@ const ProjectContent = ({
   
                                 {/* Prerequisites */}
                                 {phase.prerequisites && phase.prerequisites.length > 0 && (
-                                  <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg p-3">
-                                    <h4 className="text-sm font-semibold text-orange-800 mb-2 flex items-center">
+                                  <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3">
+                                    <h4 className="text-sm font-semibold text-blue-800 mb-2 flex items-center">
                                       <Clock className="w-4 h-4 mr-2" />
                                       Prerequisites
                                     </h4>
                                     <div className="space-y-1">
                                       {phase.prerequisites.map((prereq, idx) => (
-                                        <div key={idx} className="text-sm text-orange-700 flex items-start">
-                                          <span className="text-orange-400 mr-2 mt-1">•</span>
+                                        <div key={idx} className="text-sm text-blue-700 flex items-start">
+                                          <span className="text-blue-400 mr-2 mt-1">•</span>
                                           <span>{prereq}</span>
                                         </div>
                                       ))}
@@ -417,15 +536,15 @@ const ProjectContent = ({
   
                                 {/* Resources */}
                                 {phase.resources && phase.resources.length > 0 && (
-                                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3">
-                                    <h4 className="text-sm font-semibold text-green-800 mb-2 flex items-center">
+                                  <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3">
+                                    <h4 className="text-sm font-semibold text-blue-800 mb-2 flex items-center">
                                       <FileText className="w-4 h-4 mr-2" />
                                       Resources
                                     </h4>
                                     <div className="space-y-1">
                                       {phase.resources.map((resource, idx) => (
-                                        <div key={idx} className="text-sm text-green-700 flex items-start">
-                                          <span className="text-green-400 mr-2 mt-1">•</span>
+                                        <div key={idx} className="text-sm text-blue-700 flex items-start">
+                                          <span className="text-blue-400 mr-2 mt-1">•</span>
                                           <span>{resource}</span>
                                         </div>
                                       ))}
@@ -435,15 +554,15 @@ const ProjectContent = ({
   
                                 {/* Practice Activities */}
                                 {phase.practiceActivities && phase.practiceActivities.length > 0 && (
-                                  <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-3">
-                                    <h4 className="text-sm font-semibold text-indigo-800 mb-2 flex items-center">
+                                  <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-3">
+                                    <h4 className="text-sm font-semibold text-blue-800 mb-2 flex items-center">
                                       <Play className="w-4 h-4 mr-2" />
                                       Practice Activities
                                     </h4>
                                     <div className="space-y-1">
                                       {phase.practiceActivities.map((activity, idx) => (
-                                        <div key={idx} className="text-sm text-indigo-700 flex items-start">
-                                          <span className="text-indigo-400 mr-2 mt-1">•</span>
+                                        <div key={idx} className="text-sm text-blue-700 flex items-start">
+                                          <span className="text-blue-400 mr-2 mt-1">•</span>
                                           <span>{activity}</span>
                                         </div>
                                       ))}
@@ -458,10 +577,10 @@ const ProjectContent = ({
                                   onClick={() => handleStudyPlanItemToggle(index, phase.status)}
                                   className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
                                     phase.status === 'completed' 
-                                      ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 shadow-lg shadow-green-200' 
+                                      ? 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 shadow-lg shadow-green-200' 
                                       : phase.status === 'current'
-                                      ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600 shadow-lg shadow-blue-200'
-                                      : 'bg-gradient-to-r from-gray-500 to-slate-500 text-white hover:from-gray-600 hover:to-slate-600 shadow-lg shadow-gray-200'
+                                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 shadow-lg shadow-blue-200'
+                                      : 'bg-gradient-to-r from-gray-500 to-gray-600 text-white hover:from-gray-600 hover:to-gray-700 shadow-lg shadow-gray-200'
                                   }`}
                                 >
                                   {phase.status === 'completed' ? (
@@ -487,8 +606,8 @@ const ProjectContent = ({
               </div>
             ) : (
               <div className="text-center py-12">
-                <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-50 rounded-2xl p-8 max-w-2xl mx-auto border border-blue-100 shadow-xl">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
+                <div className="bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 rounded-2xl p-8 max-w-2xl mx-auto border border-blue-100 shadow-xl">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
                     <Calendar className="w-8 h-8 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">Create Your Learning Journey</h3>
@@ -498,7 +617,7 @@ const ProjectContent = ({
                   <button
                     onClick={() => generateAIContent('study-plan')}
                     disabled={aiLoading}
-                    className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-blue-200 disabled:opacity-50 font-semibold"
+                    className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-blue-200 disabled:opacity-50 font-semibold"
                   >
                     {aiLoading ? (
                       <>
@@ -517,7 +636,8 @@ const ProjectContent = ({
             )}
           </div>
         );
-    case 'flashcards':
+    
+        case 'flashcards':
       return (
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
