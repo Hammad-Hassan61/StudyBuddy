@@ -263,207 +263,260 @@ const ProjectContent = ({
         </div>
       );
 
-    case 'study-plan':
-      return (
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold text-gray-900">Study Plan</h2>
-            <button
-              onClick={() => generateAIContent('study-plan')}
-              disabled={aiLoading}
-              className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-            >
-              {aiLoading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Generating...</span>
-                </>
-              ) : (
-                <>
-                  <Zap className="w-4 h-4" />
-                  <span>Generate Study Plan</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          {studyPlanContent ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {studyPlanContent.map((phase, index) => (
-                <div
-                  key={index}
-                  className={`bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-300 ${
-                    phase.status === 'current' ? 'border-blue-500 ring-2 ring-blue-100' : 
-                    phase.status === 'completed' ? 'border-green-500 ring-2 ring-green-100' : ''
-                  }`}
-                >
-                  {/* Header Section */}
-                  <div className="flex items-start justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">{phase.phase}</h3>
-                    <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded-full">
-                      {phase.duration}
-                    </span>
-                  </div>
-
-                  {/* Content Sections */}
-                  <div className="space-y-4">
-                    {/* Objectives */}
-                    {phase.objectives && phase.objectives.length > 0 && (
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center">
-                          <Target className="w-4 h-4 mr-2 text-blue-500" />
-                          Learning Objectives
-                        </h4>
-                        <ul className="space-y-1">
-                          {phase.objectives.map((objective, idx) => (
-                            <li key={idx} className="text-sm text-gray-600 flex items-start">
-                              <span className="text-blue-500 mr-2">•</span>
-                              {objective}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Topics */}
-                    {phase.topics && phase.topics.length > 0 && (
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center">
-                          <Brain className="w-4 h-4 mr-2 text-purple-500" />
-                          Topics
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {phase.topics.map((topic, idx) => (
-                            <span key={idx} className="px-2 py-1 bg-purple-50 text-purple-700 text-xs rounded-full">
-                              {topic}
-                            </span>
-                          ))}
+      case 'study-plan':
+        return (
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900">Study Plan</h2>
+              <button
+                onClick={() => generateAIContent('study-plan')}
+                disabled={aiLoading}
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >
+                {aiLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Generating...</span>
+                  </>
+                ) : (
+                  <>
+                    <Zap className="w-4 h-4" />
+                    <span>Generate Study Plan</span>
+                  </>
+                )}
+              </button>
+            </div>
+  
+            {studyPlanContent ? (
+              <div className="relative">
+                {/* Tree Structure Container */}
+                <div className="relative flex flex-col items-center space-y-8">
+                  {/* Vertical Line - Main Tree Trunk */}
+                  <div className="absolute left-1/2 top-0 w-1 bg-gradient-to-b from-blue-200 via-purple-200 to-green-200 transform -translate-x-1/2 h-full"></div>
+                  
+                  {studyPlanContent.map((phase, index) => (
+                    <div key={index} className="relative w-full max-w-6xl">
+                      {/* Branch Line */}
+                      <div className={`absolute top-1/2 transform -translate-y-1/2 w-16 h-0.5 ${
+                        index % 2 === 0 ? 'left-1/2 bg-gradient-to-r' : 'right-1/2 bg-gradient-to-l'
+                      } ${
+                        phase.status === 'completed' ? 'from-green-400 to-green-200' :
+                        phase.status === 'current' ? 'from-blue-400 to-blue-200' :
+                        'from-gray-300 to-gray-200'
+                      }`}></div>
+  
+                      {/* Tree Node */}
+                      <div className={`flex ${index % 2 === 0 ? 'justify-start pl-20' : 'justify-end pr-20'} relative`}>
+                        {/* Connection Node */}
+                        <div className={`absolute top-1/2 transform -translate-y-1/2 w-4 h-4 rounded-full border-4 ${
+                          index % 2 === 0 ? 'left-1/2 ml-12' : 'right-1/2 mr-12'
+                        } ${
+                          phase.status === 'completed' ? 'bg-green-400 border-green-200' :
+                          phase.status === 'current' ? 'bg-blue-400 border-blue-200 animate-pulse' :
+                          'bg-gray-300 border-gray-200'
+                        } shadow-lg`}></div>
+  
+                        {/* Phase Card */}
+                        <div className={`w-full max-w-md transform transition-all duration-500 hover:scale-105 ${
+                          index % 2 === 0 ? 'hover:translate-x-2' : 'hover:-translate-x-2'
+                        }`}>
+                          <div className={`relative bg-white rounded-2xl shadow-xl border-2 overflow-hidden ${
+                            phase.status === 'current' ? 'border-blue-400 shadow-blue-200' : 
+                            phase.status === 'completed' ? 'border-green-400 shadow-green-200' : 
+                            'border-gray-200 shadow-gray-200'
+                          }`}>
+                            {/* Status Indicator Bar */}
+                            <div className={`h-2 w-full ${
+                              phase.status === 'completed' ? 'bg-gradient-to-r from-green-400 to-green-500' :
+                              phase.status === 'current' ? 'bg-gradient-to-r from-blue-400 to-blue-500' :
+                              'bg-gradient-to-r from-gray-300 to-gray-400'
+                            }`}></div>
+  
+                            <div className="p-6">
+                              {/* Header */}
+                              <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center space-x-3">
+                                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                                    phase.status === 'completed' ? 'bg-green-100 text-green-600' :
+                                    phase.status === 'current' ? 'bg-blue-100 text-blue-600' :
+                                    'bg-gray-100 text-gray-600'
+                                  }`}>
+                                    {phase.status === 'completed' ? <CheckCircle className="w-5 h-5" /> :
+                                     phase.status === 'current' ? <Play className="w-5 h-5" /> :
+                                     <Clock className="w-5 h-5" />}
+                                  </div>
+                                  <div>
+                                    <h3 className="text-lg font-bold text-gray-900">{phase.phase}</h3>
+                                    <span className="text-sm text-gray-500">{phase.duration}</span>
+                                  </div>
+                                </div>
+                                <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                  phase.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                  phase.status === 'current' ? 'bg-blue-100 text-blue-800' :
+                                  'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {phase.status === 'completed' ? 'Completed' :
+                                   phase.status === 'current' ? 'In Progress' : 'Upcoming'}
+                                </div>
+                              </div>
+  
+                              {/* Content Sections */}
+                              <div className="space-y-4">
+                                {/* Objectives */}
+                                {phase.objectives && phase.objectives.length > 0 && (
+                                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3">
+                                    <h4 className="text-sm font-semibold text-blue-800 mb-2 flex items-center">
+                                      <Target className="w-4 h-4 mr-2" />
+                                      Learning Objectives
+                                    </h4>
+                                    <div className="space-y-1">
+                                      {phase.objectives.map((objective, idx) => (
+                                        <div key={idx} className="text-sm text-blue-700 flex items-start">
+                                          <span className="text-blue-400 mr-2 mt-1">•</span>
+                                          <span>{objective}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+  
+                                {/* Topics */}
+                                {phase.topics && phase.topics.length > 0 && (
+                                  <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-3">
+                                    <h4 className="text-sm font-semibold text-purple-800 mb-2 flex items-center">
+                                      <Brain className="w-4 h-4 mr-2" />
+                                      Topics
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                      {phase.topics.map((topic, idx) => (
+                                        <span key={idx} className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full font-medium">
+                                          {topic}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+  
+                                {/* Prerequisites */}
+                                {phase.prerequisites && phase.prerequisites.length > 0 && (
+                                  <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg p-3">
+                                    <h4 className="text-sm font-semibold text-orange-800 mb-2 flex items-center">
+                                      <Clock className="w-4 h-4 mr-2" />
+                                      Prerequisites
+                                    </h4>
+                                    <div className="space-y-1">
+                                      {phase.prerequisites.map((prereq, idx) => (
+                                        <div key={idx} className="text-sm text-orange-700 flex items-start">
+                                          <span className="text-orange-400 mr-2 mt-1">•</span>
+                                          <span>{prereq}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+  
+                                {/* Resources */}
+                                {phase.resources && phase.resources.length > 0 && (
+                                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3">
+                                    <h4 className="text-sm font-semibold text-green-800 mb-2 flex items-center">
+                                      <FileText className="w-4 h-4 mr-2" />
+                                      Resources
+                                    </h4>
+                                    <div className="space-y-1">
+                                      {phase.resources.map((resource, idx) => (
+                                        <div key={idx} className="text-sm text-green-700 flex items-start">
+                                          <span className="text-green-400 mr-2 mt-1">•</span>
+                                          <span>{resource}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+  
+                                {/* Practice Activities */}
+                                {phase.practiceActivities && phase.practiceActivities.length > 0 && (
+                                  <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-3">
+                                    <h4 className="text-sm font-semibold text-indigo-800 mb-2 flex items-center">
+                                      <Play className="w-4 h-4 mr-2" />
+                                      Practice Activities
+                                    </h4>
+                                    <div className="space-y-1">
+                                      {phase.practiceActivities.map((activity, idx) => (
+                                        <div key={idx} className="text-sm text-indigo-700 flex items-start">
+                                          <span className="text-indigo-400 mr-2 mt-1">•</span>
+                                          <span>{activity}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+  
+                              {/* Action Button */}
+                              <div className="mt-6 pt-4 border-t border-gray-100">
+                                <button
+                                  onClick={() => handleStudyPlanItemToggle(index, phase.status)}
+                                  className={`w-full py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
+                                    phase.status === 'completed' 
+                                      ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 shadow-lg shadow-green-200' 
+                                      : phase.status === 'current'
+                                      ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600 shadow-lg shadow-blue-200'
+                                      : 'bg-gradient-to-r from-gray-500 to-slate-500 text-white hover:from-gray-600 hover:to-slate-600 shadow-lg shadow-gray-200'
+                                  }`}
+                                >
+                                  {phase.status === 'completed' ? (
+                                    <span className="flex items-center justify-center">
+                                      <CheckCircle className="w-4 h-4 mr-2" />
+                                      Mark as Incomplete
+                                    </span>
+                                  ) : (
+                                    <span className="flex items-center justify-center">
+                                      <Target className="w-4 h-4 mr-2" />
+                                      Mark as Complete
+                                    </span>
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    )}
-
-                    {/* Prerequisites */}
-                    {phase.prerequisites && phase.prerequisites.length > 0 && (
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center">
-                          <Clock className="w-4 h-4 mr-2 text-orange-500" />
-                          Prerequisites
-                        </h4>
-                        <ul className="space-y-1">
-                          {phase.prerequisites.map((prereq, idx) => (
-                            <li key={idx} className="text-sm text-gray-600 flex items-start">
-                              <span className="text-orange-500 mr-2">•</span>
-                              {prereq}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Resources */}
-                    {phase.resources && phase.resources.length > 0 && (
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center">
-                          <FileText className="w-4 h-4 mr-2 text-green-500" />
-                          Resources
-                        </h4>
-                        <ul className="space-y-1">
-                          {phase.resources.map((resource, idx) => (
-                            <li key={idx} className="text-sm text-gray-600 flex items-start">
-                              <span className="text-green-500 mr-2">•</span>
-                              {resource}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Practice Activities */}
-                    {phase.practiceActivities && phase.practiceActivities.length > 0 && (
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center">
-                          <Play className="w-4 h-4 mr-2 text-indigo-500" />
-                          Practice Activities
-                        </h4>
-                        <ul className="space-y-1">
-                          {phase.practiceActivities.map((activity, idx) => (
-                            <li key={idx} className="text-sm text-gray-600 flex items-start">
-                              <span className="text-indigo-500 mr-2">•</span>
-                              {activity}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Footer Section */}
-                  <div className="flex items-center justify-between pt-4 mt-4 border-t border-gray-100">
-                    <div className="flex items-center">
-                      {phase.status === 'current' && (
-                        <span className="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full whitespace-nowrap">
-                          <Play className="w-3 h-3 mr-1 flex-shrink-0" />
-                          <span>In Progress</span>
-                        </span>
-                      )}
-                      {phase.status === 'completed' && (
-                        <span className="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full whitespace-nowrap">
-                          <CheckCircle className="w-3 h-3 mr-1 flex-shrink-0" />
-                          <span>Completed</span>
-                        </span>
-                      )}
-                      {phase.status === 'upcoming' && (
-                        <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full whitespace-nowrap">
-                          <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
-                          <span>Upcoming</span>
-                        </span>
-                      )}
                     </div>
-                    <button
-                      onClick={() => handleStudyPlanItemToggle(index, phase.status)}
-                      className={`text-sm font-medium px-3 py-1 rounded-lg transition-colors whitespace-nowrap ${
-                        phase.status === 'completed' 
-                          ? 'text-green-600 hover:text-green-800 hover:bg-green-50' 
-                          : 'text-blue-600 hover:text-blue-800 hover:bg-blue-50'
-                      }`}
-                    >
-                      {phase.status === 'completed' ? 'Mark as Incomplete' : 'Mark as Complete'}
-                    </button>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <div className="bg-gray-50 rounded-xl p-8 max-w-2xl mx-auto">
-                <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No Study Plan Generated Yet</h3>
-                <p className="text-gray-600 mb-6">
-                  Generate a personalized study plan based on your uploaded materials to help you stay organized and track your progress.
-                </p>
-                <button
-                  onClick={() => generateAIContent('study-plan')}
-                  disabled={aiLoading}
-                  className="inline-flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-                >
-                  {aiLoading ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Generating...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="w-4 h-4" />
-                      <span>Generate Study Plan</span>
-                    </>
-                  )}
-                </button>
               </div>
-            </div>
-          )}
-        </div>
-      );
-
+            ) : (
+              <div className="text-center py-12">
+                <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-indigo-50 rounded-2xl p-8 max-w-2xl mx-auto border border-blue-100 shadow-xl">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
+                    <Calendar className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Create Your Learning Journey</h3>
+                  <p className="text-gray-600 mb-6 leading-relaxed">
+                    Generate a personalized study roadmap that adapts to your learning style and helps you track your progress through an interactive tree structure.
+                  </p>
+                  <button
+                    onClick={() => generateAIContent('study-plan')}
+                    disabled={aiLoading}
+                    className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-blue-200 disabled:opacity-50 font-semibold"
+                  >
+                    {aiLoading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Creating Your Journey...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-5 h-5" />
+                        <span>Generate Study Plan</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
     case 'flashcards':
       return (
         <div className="space-y-6">

@@ -25,5 +25,6 @@ export const API_ROUTES = {
         GET_ROADMAP: (projectId) => `${BACKEND_URL}/api/ai/projects/${projectId}/roadmap`,
         GET_SLIDES: (projectId) => `${BACKEND_URL}/api/ai/projects/${projectId}/slides`,
         UPDATE_STUDY_PLAN_ITEM: (studyPlanId, itemIndex) => `${BACKEND_URL}/api/ai/study-plans/${studyPlanId}/items/${itemIndex}/status`,
+        UPDATE_PROJECT_PROGRESS: (projectId) => `${BACKEND_URL}/api/ai/projects/${projectId}/progress`,
     }
 }

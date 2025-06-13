@@ -52,6 +52,7 @@ export default function StudyBuddyDashboard() {
   const { user, loading, logout } = useUser();
   const [currentView, setCurrentView] = useState('dashboard');
   const [selectedProject, setSelectedProject] = useState(null);
+  const [studyPlanId, setStudyPlanId] = useState(null);
 
   const [chatInput, setChatInput] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -130,7 +131,9 @@ export default function StudyBuddyDashboard() {
           case 'study-plan':
             if (!studyPlanContent) {
               response = await axios.get(API_ROUTES.AI_CONTENT.GET_STUDY_PLAN(selectedProject._id), { headers });
-              setStudyPlanContent(response.data.content);
+              // Make sure we're setting the content array, not the whole study plan object
+              setStudyPlanContent(response.data.content || []);
+              setStudyPlanId(response.data._id);
             }
             break;
           case 'flashcards':
@@ -265,7 +268,10 @@ export default function StudyBuddyDashboard() {
     setAiLoading(true);
     // Clear previous content state for the current type before generating new one
     switch (contentType) {
-        case 'study-plan': setStudyPlanContent(null); break;
+        case 'study-plan': 
+          setStudyPlanContent(null); 
+          setStudyPlanId(null); // Also clear the study plan ID
+          break;
         case 'flashcards': setFlashcardsContent(null); break;
         case 'qa': setQaContent(null); break;
         case 'roadmap': setRoadmapContent(null); break;
@@ -279,14 +285,16 @@ export default function StudyBuddyDashboard() {
         projectId: selectedProject._id,
         contentInput: selectedProject.extractedTextContent,
         projectName: selectedProject.title, // Pass project name for context
+        projectDescription: selectedProject.description // Pass project description
       };
 
       let response;
       switch (contentType) {
         case 'study-plan':
           response = await axios.post(API_ROUTES.AI_GENERATE.STUDY_PLAN, payload, { headers: { Authorization: `Bearer ${token}` } });
-          setStudyPlanContent(response.data.data.content);
-         
+          // Make sure we're setting the content array, not the whole study plan object
+          setStudyPlanContent(response.data.data.content || []);
+          setStudyPlanId(response.data.data._id);
           break;
         case 'flashcards':
           response = await axios.post(API_ROUTES.AI_GENERATE.FLASHCARDS, payload, { headers: { Authorization: `Bearer ${token}` } });
@@ -316,19 +324,44 @@ export default function StudyBuddyDashboard() {
   };
 
   const handleStudyPlanItemToggle = async (itemIndex, currentStatus) => {
-    if (!selectedProject || !studyPlanContent || !studyPlanContent._id) return;
+    console.log("Triggered");
+    if (!selectedProject || !studyPlanContent || !studyPlanId){
+      console.log(selectedProject)
+      console.log(studyPlanContent)
+      console.log(studyPlanId)
+      return
+    };
 
     const newStatus = currentStatus === 'completed' ? 'upcoming' : 'completed';
 
     try {
       const token = localStorage.getItem('token');
+      
+      // First update the study plan item status
       const res = await axios.put(
-        API_ROUTES.AI_CONTENT.UPDATE_STUDY_PLAN_ITEM(studyPlanContent._id, itemIndex),
+        API_ROUTES.AI_CONTENT.UPDATE_STUDY_PLAN_ITEM(studyPlanId, itemIndex),
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      // Update the frontend state to reflect the change
-      setStudyPlanContent(res.data.studyPlan); // Backend sends back updated studyPlan
+      
+      // Then update the project progress
+      const progressRes = await axios.put(
+        API_ROUTES.AI_CONTENT.UPDATE_PROJECT_PROGRESS(selectedProject._id),
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Update both the study plan and project state
+      // Make sure we're setting the content array, not the whole study plan object
+      setStudyPlanContent(res.data.studyPlan.content || []);
+      setSelectedProject(progressRes.data.project);
+      
+      // Update the projects list to reflect the new progress
+      setProjects(prevProjects => 
+        prevProjects.map(p => 
+          p._id === progressRes.data.project._id ? progressRes.data.project : p
+        )
+      );
     } catch (error) {
       console.error("Error updating study plan item status:", error);
       // Handle error
