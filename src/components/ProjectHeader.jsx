@@ -22,7 +22,7 @@ const ProjectHeader = ({
           <p className="text-gray-600 mt-1">{project.description || 'No description provided'}</p>
         </div>
       </div>
-      <div className="flex items-center space-x-2">
+      {/* <div className="flex items-center space-x-2">
         <button 
           onClick={() => onEdit(project.title, project.description)}
           className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
@@ -32,7 +32,7 @@ const ProjectHeader = ({
         <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
           <Settings className="w-5 h-5" />
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

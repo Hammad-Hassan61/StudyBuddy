@@ -1,8 +1,9 @@
-export const BACKEND_URL = "http://localhost:5000";
+export const BACKEND_URL = 'http://localhost:5000';
 
 export const API_ROUTES = {
     AUTH: {
-        LOGIN: `${BACKEND_URL}/api/auth/google`,
+        REGISTER: `${BACKEND_URL}/api/auth/register`,
+        LOGIN: `${BACKEND_URL}/api/auth/login`,
         ME: `${BACKEND_URL}/api/auth/me`,
     },
     PROJECTS: {

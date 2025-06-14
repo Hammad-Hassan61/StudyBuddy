@@ -67,6 +67,13 @@ export default function StudyBuddyDashboard() {
   const [qaContent, setQaContent] = useState(null);
   const [slidesContent, setSlidesContent] = useState(null);
   const [summaryContent, setSummaryContent] = useState(null);
+  const [loadingStates, setLoadingStates] = useState({
+    'study-plan': false,
+    'flashcards': false,
+    'qa': false,
+    'slides': false,
+    'summary': false
+  });
   const [aiLoading, setAiLoading] = useState(false);
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
 
@@ -250,10 +257,14 @@ export default function StudyBuddyDashboard() {
   };
 
   const showToast = (message, type = 'info') => {
+    // Only show toast if there's a message
+    if (!message) return;
+    
     setToast({ show: true, message, type });
+    // Clear toast after 3 seconds
     setTimeout(() => {
       setToast({ show: false, message: '', type: 'info' });
-    }, 5000);
+    }, 3000);
   };
 
   const generateAIContent = async (contentType) => {
@@ -269,8 +280,8 @@ export default function StudyBuddyDashboard() {
 
     // Clear previous content based on type
     switch (contentType) {
-        case 'study-plan': 
-          setStudyPlanContent(null); 
+      case 'study-plan': 
+        setStudyPlanContent(null); 
         break;
       case 'flashcards':
         setFlashcardsContent(null);
@@ -283,10 +294,14 @@ export default function StudyBuddyDashboard() {
         break;
       case 'summary':
         setSummaryContent(null);
-          break;
+        break;
     }
 
-    setAiLoading(true);
+    // Set loading state only for the current content type
+    setLoadingStates(prev => ({
+      ...prev,
+      [contentType]: true
+    }));
     setCurrentView(contentType);
 
     try {
@@ -305,8 +320,6 @@ export default function StudyBuddyDashboard() {
         case 'study-plan':
           response = await axios.post(API_ROUTES.AI_GENERATE.STUDY_PLAN, payload, { headers });
           setStudyPlanContent(response.data.data);
-          
-          
           break;
         case 'flashcards':
           response = await axios.post(API_ROUTES.AI_GENERATE.FLASHCARDS, payload, { headers });
@@ -331,7 +344,11 @@ export default function StudyBuddyDashboard() {
       console.error('Error generating content:', error);
       showToast(error.response?.data?.message || 'Failed to generate content', 'error');
     } finally {
-      setAiLoading(false);
+      // Clear loading state only for the current content type
+      setLoadingStates(prev => ({
+        ...prev,
+        [contentType]: false
+      }));
     }
   };
 
@@ -477,7 +494,7 @@ export default function StudyBuddyDashboard() {
               qaContent={qaContent}
               slidesContent={slidesContent}
               summaryContent={summaryContent}
-              aiLoading={aiLoading}
+              loadingStates={loadingStates}
               isUploading={isUploading}
               uploadProgress={uploadProgress}
               fileInputRef={fileInputRef}
@@ -491,17 +508,54 @@ export default function StudyBuddyDashboard() {
             {selectedProject && <RenderChatbot projectId={selectedProject._id} />}
         </div>
       ) : (
-          <ProjectGrid 
-            projects={projects}
-            setShowNewProjectModal={setShowNewProjectModal}
-            setSelectedProject={setSelectedProject}
-            setCurrentView={setCurrentView}
-            setShowProjectDropdownId={setShowProjectDropdownId}
-            showProjectDropdownId={showProjectDropdownId}
-            setProjectToEdit={setProjectToEdit}
-            setShowEditProjectModal={setShowEditProjectModal}
-            openDeleteConfirmModal={openDeleteConfirmModal}
-          />
+          <div className="space-y-8 animate-fade-in">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">My Study Projects</h1>
+                <p className="text-gray-600 mt-1">Manage your learning materials and track progress</p>
+              </div>
+              <button 
+                onClick={() => setShowNewProjectModal(true)}
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-300 flex items-center space-x-2 shadow-sm hover:shadow-md"
+              >
+                <Plus className="w-5 h-5" />
+                <span>New Project</span>
+              </button>
+            </div>
+
+            {projects.length === 0 ? (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
+                <div className="max-w-md mx-auto">
+                  <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <BookOpen className="w-10 h-10 text-blue-600" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">No Projects Yet</h3>
+                  <p className="text-gray-600 mb-8">
+                    Start your learning journey by creating your first study project. Upload materials, generate summaries, and create interactive study content.
+                  </p>
+                  <button
+                    onClick={() => setShowNewProjectModal(true)}
+                    className="inline-flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all duration-300 shadow-sm hover:shadow-md"
+                  >
+                    <Plus className="w-5 h-5" />
+                    <span>Create Your First Project</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <ProjectGrid 
+                projects={projects}
+                setShowNewProjectModal={setShowNewProjectModal}
+                setSelectedProject={setSelectedProject}
+                setCurrentView={setCurrentView}
+                setShowProjectDropdownId={setShowProjectDropdownId}
+                showProjectDropdownId={showProjectDropdownId}
+                setProjectToEdit={setProjectToEdit}
+                setShowEditProjectModal={setShowEditProjectModal}
+                openDeleteConfirmModal={openDeleteConfirmModal}
+              />
+            )}
+          </div>
         )}
       </main>
 
@@ -557,10 +611,10 @@ export default function StudyBuddyDashboard() {
 
       {/* Toast Component */}
       <Toast
-        show={toast.show}
+        show={toast.show && !!toast.message}
         message={toast.message}
         type={toast.type}
-        onClose={() => setToast({ ...toast, show: false })}
+        onClose={() => setToast({ show: false, message: '', type: 'info' })}
       />
 
       <style jsx>{`

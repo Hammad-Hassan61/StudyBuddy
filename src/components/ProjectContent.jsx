@@ -24,7 +24,7 @@ const ProjectContent = ({
   qaContent,
   slidesContent,
   summaryContent,
-  aiLoading,
+  loadingStates,
   isUploading,
   uploadProgress,
   fileInputRef,
@@ -297,10 +297,10 @@ const ProjectContent = ({
               <h2 className="text-2xl font-bold text-gray-900">Study Plan</h2>
               <button
                 onClick={() => generateAIContent('study-plan')}
-                disabled={aiLoading}
+                disabled={loadingStates['study-plan']}
                 className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
               >
-                {aiLoading ? (
+                {loadingStates['study-plan'] ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     <span>Generating...</span>
@@ -524,10 +524,10 @@ const ProjectContent = ({
                   </p>
                   <button
                     onClick={() => generateAIContent('study-plan')}
-                    disabled={aiLoading}
+                    disabled={loadingStates['study-plan']}
                     className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-blue-200 disabled:opacity-50 font-semibold"
                   >
-                    {aiLoading ? (
+                    {loadingStates['study-plan'] ? (
                       <>
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                         <span>Creating Your Journey...</span>
@@ -584,7 +584,7 @@ const ProjectContent = ({
             </div>
         
                   {/* Empty State */}
-            {!flashcardsContent && !aiLoading && (
+            {!flashcardsContent && !loadingStates['flashcards'] && (
                     <div className="text-center py-12">
                       <div className="relative mb-8">
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-10 blur-2xl" />
@@ -614,7 +614,7 @@ const ProjectContent = ({
             )}
         
                   {/* Loading State */}
-            {aiLoading && currentView === 'flashcards' && (
+            {loadingStates['flashcards'] && currentView === 'flashcards' && (
                     <div className="text-center py-16">
                       <div className="relative mb-6">
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full opacity-20 blur-xl animate-pulse" />
@@ -702,7 +702,7 @@ const ProjectContent = ({
             </div>
       
                 {/* Empty State */}
-            {!qaContent && !aiLoading && (
+            {!qaContent && !loadingStates['qa'] && (
                   <div className="text-center py-12">
                     <div className="relative mb-8">
                       <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-10 blur-2xl" />
@@ -730,7 +730,7 @@ const ProjectContent = ({
             )}
       
                 {/* Loading State */}
-            {aiLoading && currentView === 'qa' && (
+            {loadingStates['qa'] && currentView === 'qa' && (
                   <div className="text-center py-16">
                     <div className="relative mb-6">
                       <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full opacity-20 blur-xl animate-pulse" />
@@ -802,7 +802,7 @@ const ProjectContent = ({
             </div>
     
                   {/* Enhanced Empty State */}
-            {!slidesContent && !aiLoading && (
+            {!slidesContent && !loadingStates['slides'] && (
                     <div className="text-center py-16">
                       <div className="relative mb-10">
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-15 blur-3xl animate-pulse" />
@@ -831,7 +831,7 @@ const ProjectContent = ({
             )}
     
                   {/* Enhanced Loading State */}
-            {aiLoading && currentView === 'slides' && (
+            {loadingStates['slides'] && currentView === 'slides' && (
                     <div className="text-center py-20">
                       <div className="relative mb-8">
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full opacity-25 blur-2xl animate-pulse" />
@@ -968,7 +968,7 @@ const ProjectContent = ({
             </div>
 
               {/* Empty State */}
-              {!summaryContent && !aiLoading && (
+              {!summaryContent && !loadingStates['summary'] && (
                 <div className="text-center py-12">
                   <div className="relative mb-8">
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-10 blur-2xl" />
@@ -995,7 +995,7 @@ const ProjectContent = ({
             )}
 
               {/* Loading State */}
-              {aiLoading && currentView === 'summary' && (
+              {loadingStates['summary'] && currentView === 'summary' && (
                 <div className="text-center py-16">
                   <div className="relative mb-6">
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full opacity-20 blur-xl animate-pulse" />

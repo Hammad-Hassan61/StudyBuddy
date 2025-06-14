@@ -1,7 +1,22 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { BookOpen, Search, Bell, Settings, ChevronDown } from 'lucide-react';
 
 const AppHeader = ({ user, logout }) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
       <div className="flex items-center justify-between px-6 py-4">
@@ -15,7 +30,7 @@ const AppHeader = ({ user, logout }) => {
         </div>
         
         <div className="flex items-center space-x-4">
-          <div className="relative">
+          {/* <div className="relative">
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
             <input
               type="text"
@@ -28,9 +43,12 @@ const AppHeader = ({ user, logout }) => {
           </button>
           <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
             <Settings className="w-5 h-5" />
-          </button>
-          <div className="relative">
-            <div className="flex items-center space-x-2 cursor-pointer group">
+          </button> */}
+          <div className="relative" ref={dropdownRef}>
+            <div 
+              className="flex items-center space-x-2 cursor-pointer "
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
               <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                 {user && user.picture ? (
                   <img src={user.picture} alt="User Avatar" className="w-full h-full rounded-full object-cover" />
@@ -38,8 +56,10 @@ const AppHeader = ({ user, logout }) => {
                   user && user.name ? user.name.charAt(0).toUpperCase() : 'S'
                 )}
               </div>
-              <ChevronDown className="w-4 h-4 text-gray-500 group-hover:text-gray-700 transition-colors" />
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-50">
+              <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isDropdownOpen ? 'transform rotate-180' : ''}`} />
+            </div>
+            {isDropdownOpen && (
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50 ">
                 <div className="px-4 py-2 border-b border-gray-100">
                   <p className="text-sm font-medium text-gray-900">{user?.name}</p>
                   <p className="text-xs text-gray-500">{user?.email}</p>
@@ -51,7 +71,7 @@ const AppHeader = ({ user, logout }) => {
                   Logout
                 </button>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

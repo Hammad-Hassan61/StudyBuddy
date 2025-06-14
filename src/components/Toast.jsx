@@ -1,7 +1,10 @@
 import React from 'react';
 import { X, AlertCircle, CheckCircle, Info } from 'lucide-react';
 
-const Toast = ({ message, type = 'info', onClose }) => {
+const Toast = ({ message, type = 'info', onClose, show }) => {
+  // Don't render if there's no message or show is false
+  if (!message || !show) return null;
+
   const getIcon = () => {
     switch (type) {
       case 'error':

@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, Clock, Brain, Zap, Upload, Users, Mic, FileText, Target, Lightbulb, ArrowRight } from 'lucide-react';
-import { FaGoogle } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
-import { BACKEND_URL } from '../services/api';
+import { API_ROUTES } from '../services/api';
 import { useUser } from '../UserContext';
-
-const GOOGLE_AUTH_URL = `${BACKEND_URL}/api/auth/google`;
+import axios from 'axios';
 
 const StudyBuddyLanding = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    name: ''
+  });
+  const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { user, loading } = useUser();
+  const { user, loading, setUser } = useUser();
 
   // Redirect to dashboard if user is logged in
   useEffect(() => {
@@ -29,45 +34,48 @@ const StudyBuddyLanding = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Listen for Google OAuth callback
-  useEffect(() => {
-    const handleMessage = (event) => {
-      if (event.data && event.data.type === 'google-auth-success') {
-        setShowAuthModal(false);
-        navigate('/dashboard');
-      }
-    };
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, [navigate]);
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      const endpoint = isLogin ? API_ROUTES.AUTH.LOGIN : API_ROUTES.AUTH.REGISTER;
+      const payload = {
+        email: formData.email.trim(),
+        password: formData.password,
+        ...(isLogin ? {} : { name: formData.name.trim() })
+      };
+      
+      console.log('Sending auth request:', { 
+        endpoint, 
+        payload: { ...payload, password: '***' } 
+      });
+
+      const response = await axios.post(endpoint, payload);
+      
+      console.log('Auth response:', response.data);
+      
+      localStorage.setItem('token', response.data.token);
+      setUser(response.data.user);
+      setShowAuthModal(false);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Auth error:', error.response?.data || error);
+      setError(error.response?.data?.message || 'An error occurred');
+    }
+  };
 
   // If still loading or user is logged in, show nothing
   if (loading || user) {
     return null;
   }
-
-  const openGoogleAuth = () => {
-    // Open Google OAuth in a new window
-    const width = 500;
-    const height = 600;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2;
-    const authWindow = window.open(
-      GOOGLE_AUTH_URL,
-      'GoogleAuth',
-      `width=${width},height=${height},left=${left},top=${top}`
-    );
-
-    // Poll for token in URL (for local dev, you may want to use postMessage from your frontend callback page)
-    const timer = setInterval(() => {
-      try {
-        if (authWindow.closed) {
-          clearInterval(timer);
-        }
-        // You can implement token passing via postMessage for more security
-      } catch (e) {}
-    }, 500);
-  };
 
   const features = [
     { icon: FileText, title: "Smart Summaries", desc: "AI-powered content analysis" },
@@ -95,15 +103,69 @@ const StudyBuddyLanding = () => {
             >
               ×
             </button>
-            <h2 className="text-2xl font-bold mb-6 text-center text-blue-700">Welcome to Study Buddy</h2>
-            <p className="mb-6 text-center text-gray-600">Continue with google</p>
-            <button
-              className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all duration-300 shadow-lg mb-4"
-              onClick={openGoogleAuth}
-            >
-             <FaGoogle className="w-5 h-5" /> Continue with google
-            </button>
-            <div className="text-center text-gray-400 text-xs">We never post to Google or share your data.</div>
+            <h2 className="text-2xl font-bold mb-6 text-center text-blue-700">
+              {isLogin ? 'Welcome Back' : 'Create Account'}
+            </h2>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {!isLogin && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  />
+                </div>
+              )}
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+
+              {error && (
+                <div className="text-red-500 text-sm">{error}</div>
+              )}
+
+              <button
+                type="submit"
+                className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all duration-300 shadow-lg"
+              >
+                {isLogin ? 'Login' : 'Sign Up'}
+              </button>
+            </form>
+
+            <div className="mt-4 text-center">
+              <button
+                onClick={() => setIsLogin(!isLogin)}
+                className="text-blue-600 hover:text-blue-700 text-sm"
+              >
+                {isLogin ? "Don't have an account? Sign up" : "Already have an account? Login"}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -293,3 +355,4 @@ const StudyBuddyLanding = () => {
 };
 
 export default StudyBuddyLanding;
+
