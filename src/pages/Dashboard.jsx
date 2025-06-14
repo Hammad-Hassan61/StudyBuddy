@@ -141,13 +141,13 @@ export default function StudyBuddyDashboard() {
           case 'flashcards':
             if (!flashcardsContent) {
               response = await axios.get(API_ROUTES.AI_CONTENT.GET_FLASHCARDS(selectedProject._id), { headers });
-              setFlashcardsContent(response.data.content);
+              setFlashcardsContent(response.data);
             }
             break;
           case 'qa':
             if (!qaContent) {
               response = await axios.get(API_ROUTES.AI_CONTENT.GET_QA(selectedProject._id), { headers });
-              setQaContent(response.data.content);
+              setQaContent(response.data);
             }
             break;
           case 'roadmap':
@@ -302,12 +302,12 @@ export default function StudyBuddyDashboard() {
           break;
         case 'flashcards':
           response = await axios.post(API_ROUTES.AI_GENERATE.FLASHCARDS, payload, { headers: { Authorization: `Bearer ${token}` } });
-          setFlashcardsContent(response.data.data.content);
+          setFlashcardsContent(response.data.data);
           showToast('Flashcards generated successfully!', 'success');
           break;
         case 'qa':
           response = await axios.post(API_ROUTES.AI_GENERATE.QA, payload, { headers: { Authorization: `Bearer ${token}` } });
-          setQaContent(response.data.data.content);
+          setQaContent(response.data.data);
           showToast('Q&A generated successfully!', 'success');
           break;
         case 'roadmap':

@@ -11,7 +11,8 @@ import {
   Zap,
   Presentation,
   Map,
-  Mic
+  Mic,
+  MessageCircleQuestion
 } from 'lucide-react';
 import FlashcardDisplay from './FlashcardDisplay';
 
@@ -638,93 +639,226 @@ const ProjectContent = ({
         );
     
         case 'flashcards':
-      return (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
-            <div className="flex items-center justify-between mb-4">
-              <Brain className="w-16 h-16 text-blue-500 mx-auto" />
-              {flashcardsContent && (
-                <button 
-                  onClick={() => generateAIContent('flashcards')}
-                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
-                >
-                  <Zap className="w-4 h-4" />
-                  <span>Regenerate</span>
-                </button>
-              )}
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Interactive Flashcards</h2>
-            {!flashcardsContent && !aiLoading && (
-              <div className="py-4">
-                <p className="text-gray-600 mb-6">Generate interactive flashcards from your uploaded materials.</p>
-                <button 
-                  onClick={() => generateAIContent('flashcards')}
-                  className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-                >
-                  Generate Flashcards
-                </button>
-              </div>
-            )}
-            {aiLoading && currentView === 'flashcards' && (
-              <div className="py-4">
-                <div className="animate-spin w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-blue-600">Generating flashcards, please wait...</p>
-              </div>
-            )}
-            {flashcardsContent && flashcardsContent.content && (
-              <FlashcardDisplay cards={flashcardsContent.content} />
-            )}
-          </div>
-        </div>
-      );
-
-    case 'qa':
-      return (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
-            <div className="flex items-center justify-between mb-4">
-              <Target className="w-16 h-16 text-green-500 mx-auto" />
-              {qaContent && (
-                <button 
-                  onClick={() => generateAIContent('qa')}
-                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
-                >
-                  <Zap className="w-4 h-4" />
-                  <span>Regenerate</span>
-                </button>
-              )}
-            </div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Q&A Review Session</h2>
-            {!qaContent && !aiLoading && (
-              <div className="py-4">
-                <p className="text-gray-600 mb-6">Generate a series of questions and answers from your uploaded materials.</p>
-                <button 
-                  onClick={() => generateAIContent('qa')}
-                  className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-                >
-                  Generate Q&A
-                </button>
-              </div>
-            )}
-            {aiLoading && currentView === 'qa' && (
-              <div className="py-4">
-                <div className="animate-spin w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-blue-600">Generating Q&A, please wait...</p>
-              </div>
-            )}
-            {qaContent && qaContent.content && (
-              <div className="mt-6 text-left space-y-6">
-                {qaContent.content.map((item, index) => (
-                  <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <p className="font-semibold text-gray-800 mb-2">Q: {item.question}</p>
-                    <p className="text-gray-700">A: {item.answer}</p>
+          return (
+            <div className="space-y-8">
+              <div className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 rounded-3xl shadow-xl border border-blue-100/50 backdrop-blur-sm">
+                {/* Background decoration */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full -mr-16 -mt-16" />
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-cyan-200/20 to-transparent rounded-full -ml-12 -mb-12" />
+                
+                <div className="relative p-10">
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center space-x-4">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl opacity-20 blur-lg" />
+                        <div className="relative bg-gradient-to-r from-blue-500 to-cyan-500 p-4 rounded-2xl">
+                          <Brain className="w-10 h-10 text-white" />
+                        </div>
+                      </div>
+                      <div>
+                        <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-700 to-cyan-700 bg-clip-text text-transparent">
+                          Interactive Flashcards
+                        </h2>
+                        <p className="text-slate-600 mt-1">Study with dynamic flip cards</p>
+                      </div>
+                    </div>
+                    
+                    {flashcardsContent && (
+                      <button
+                        onClick={() => generateAIContent('flashcards')}
+                        className="group relative bg-white border border-blue-200 text-blue-600 px-6 py-3 rounded-xl font-semibold hover:bg-blue-50 hover:border-blue-300 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex items-center space-x-2"
+                      >
+                        <Zap className="w-5 h-5 group-hover:text-blue-700 transition-colors" />
+                        <span className="group-hover:text-blue-700 transition-colors">Regenerate</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
+                      </button>
+                    )}
                   </div>
-                ))}
+        
+                  {/* Empty State */}
+                  {!flashcardsContent && !aiLoading && (
+                    <div className="text-center py-12">
+                      <div className="relative mb-8">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-10 blur-2xl" />
+                        <div className="relative bg-gradient-to-br from-blue-100 to-cyan-100 p-8 rounded-full w-24 h-24 mx-auto flex items-center justify-center">
+                          <svg className="w-12 h-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                          </svg>
+                        </div>
+                      </div>
+                      
+                      <h3 className="text-xl font-semibold text-slate-800 mb-3">Create Your Study Cards</h3>
+                      <p className="text-slate-600 mb-8 max-w-md mx-auto leading-relaxed">
+                        Transform your uploaded materials into interactive flashcards for effective memorization and review.
+                      </p>
+                      
+                      <button
+                        onClick={() => generateAIContent('flashcards')}
+                        className="group relative bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-10 py-4 rounded-2xl font-bold hover:from-blue-700 hover:to-cyan-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 transform"
+                      >
+                        <span className="relative z-10 flex items-center space-x-2">
+                          <Brain className="w-5 h-5" />
+                          <span>Generate Flashcards</span>
+                        </span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-cyan-700 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      </button>
+                    </div>
+                  )}
+        
+                  {/* Loading State */}
+                  {aiLoading && currentView === 'flashcards' && (
+                    <div className="text-center py-16">
+                      <div className="relative mb-6">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full opacity-20 blur-xl animate-pulse" />
+                        <div className="relative w-16 h-16 mx-auto">
+                          <div className="absolute inset-0 border-4 border-blue-200 rounded-full opacity-30" />
+                          <div className="absolute inset-0 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                        </div>
+                      </div>
+                      
+                      <h3 className="text-xl font-semibold text-blue-700 mb-2">Creating Your Cards</h3>
+                      <p className="text-blue-600">Processing your materials and crafting interactive flashcards...</p>
+                      
+                      <div className="mt-6 flex justify-center space-x-1">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <div className="w-2 h-2 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                    </div>
+                  )}
+        
+                  {/* Flashcards Content */}
+                  {flashcardsContent && flashcardsContent.content && flashcardsContent.content.length > 0 && (
+                    <div className="space-y-6">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <h3 className="text-lg font-semibold text-slate-800">
+                            {flashcardsContent.content.length} Cards Ready
+                          </h3>
+                        </div>
+                        <div className="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                          Interactive Study Mode
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gradient-to-br from-slate-50 to-blue-50/30 rounded-2xl p-6 border border-blue-100/50">
+                        <FlashcardDisplay cards={flashcardsContent.content} />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
+            </div>
+          );
+      case 'qa':
+        return (
+          <div className="space-y-8">
+            <div className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 rounded-3xl shadow-xl border border-blue-100/50 backdrop-blur-sm">
+              {/* Background decoration */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-blue-200/20 to-transparent rounded-full -mr-16 -mt-16" />
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-cyan-200/20 to-transparent rounded-full -ml-12 -mb-12" />
+              
+              <div className="relative p-10">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl opacity-20 blur-lg" />
+                      <div className="relative bg-gradient-to-r from-blue-500 to-cyan-500 p-4 rounded-2xl">
+                        <Target className="w-10 h-10 text-white" />
+                      </div>
+                    </div>
+                    <div>
+                      <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-700 to-cyan-700 bg-clip-text text-transparent">
+                        Q&A Review Session
+                      </h2>
+                      <p className="text-slate-600 mt-1">Interactive question and answer practice</p>
+                    </div>
+                  </div>
+                  
+                  {qaContent && (
+                    <button
+                      onClick={() => generateAIContent('qa')}
+                      className="group relative bg-white border border-blue-200 text-blue-600 px-6 py-3 rounded-xl font-semibold hover:bg-blue-50 hover:border-blue-300 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex items-center space-x-2"
+                    >
+                      <Zap className="w-5 h-5 group-hover:text-blue-700 transition-colors" />
+                      <span className="group-hover:text-blue-700 transition-colors">Regenerate</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
+                    </button>
+                  )}
+                </div>
+      
+                {/* Empty State */}
+                {!qaContent && !aiLoading && (
+                  <div className="text-center py-12">
+                    <div className="relative mb-8">
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-10 blur-2xl" />
+                      <div className="relative bg-gradient-to-br from-blue-100 to-cyan-100 p-8 rounded-full w-24 h-24 mx-auto flex items-center justify-center">
+                        <MessageCircleQuestion className="w-12 h-12 text-blue-600" />
+                      </div>
+                    </div>
+                    
+                    <h3 className="text-xl font-semibold text-slate-800 mb-3">Ready to Test Your Knowledge?</h3>
+                    <p className="text-slate-600 mb-8 max-w-md mx-auto leading-relaxed">
+                      Generate comprehensive questions and answers from your uploaded materials to reinforce your learning.
+                    </p>
+                    
+                    <button
+                      onClick={() => generateAIContent('qa')}
+                      className="group relative bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-10 py-4 rounded-2xl font-bold hover:from-blue-700 hover:to-cyan-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 transform"
+                    >
+                      <span className="relative z-10 flex items-center space-x-2">
+                        <Target className="w-5 h-5" />
+                        <span>Generate Q&A Session</span>
+                      </span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-cyan-700 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </button>
+                  </div>
+                )}
+      
+                {/* Loading State */}
+                {aiLoading && currentView === 'qa' && (
+                  <div className="text-center py-16">
+                    <div className="relative mb-6">
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full opacity-20 blur-xl animate-pulse" />
+                      <div className="relative w-16 h-16 mx-auto">
+                        <div className="absolute inset-0 border-4 border-blue-200 rounded-full opacity-30" />
+                        <div className="absolute inset-0 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    </div>
+                    
+                    <h3 className="text-xl font-semibold text-blue-700 mb-2">Crafting Your Questions</h3>
+                    <p className="text-blue-600">Analyzing your materials and generating thoughtful Q&A pairs...</p>
+                    
+                    <div className="mt-6 flex justify-center space-x-1">
+                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <div className="w-2 h-2 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
+                  </div>
+                )}
+      
+                {/* Q&A Content */}
+                {qaContent && qaContent.content && qaContent.content.length > 0 && (
+                  <div className="mt-6 text-left space-y-6">
+                    {qaContent.content.map((item, index) => (
+                      <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <p className="font-semibold text-gray-800 mb-2">Q: {item.question}</p>
+                        <p className="text-gray-700">A: {item.answer}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
-      );
+        );
 
     case 'slides':
       return (
