@@ -85,7 +85,7 @@ export default function StudyBuddyDashboard() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState(null);
 
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('materials');
 
   const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
 
@@ -488,6 +488,7 @@ export default function StudyBuddyDashboard() {
               setShowPdfViewer={setShowPdfViewer}
               BACKEND_URL={BACKEND_URL}
             />
+            {selectedProject && <RenderChatbot projectId={selectedProject._id} />}
         </div>
       ) : (
           <ProjectGrid 
@@ -554,17 +555,13 @@ export default function StudyBuddyDashboard() {
         </div>
       )}
 
-      {/* AI Tutor Chatbot */}
-      <RenderChatbot />
-
       {/* Toast Component */}
-      {toast.show && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast({ show: false, message: '', type: 'info' })}
-        />
-      )}
+      <Toast
+        show={toast.show}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => setToast({ ...toast, show: false })}
+      />
 
       <style jsx>{`
         .animate-fade-in {

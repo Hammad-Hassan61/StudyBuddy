@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 const projectTabs = [
-  // { id: 'overview', label: 'Overview', icon: BarChart3 },
+  { id: 'overview', label: 'Overview', icon: BarChart3 },
   { id: 'upload', label: 'Materials', icon: Upload },
   { id: 'summary', label: 'Summary', icon: Target },
   

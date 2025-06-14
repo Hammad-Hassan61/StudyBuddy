@@ -51,157 +51,53 @@ const ProjectContent = ({
   
   switch (currentView) {
     case 'project-overview':
-      return (
-        <div className="space-y-6">
-          {/* Project Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                label: 'Study Plan Progress',
-                value: `${selectedProject.progress?.studyPlan || 0}%`,
-                icon: Calendar,
-                color: 'text-blue-500',
-                progress: selectedProject.progress?.studyPlan || 0
-              },
-              {
-                label: 'Flashcards Progress',
-                value: `${selectedProject.progress?.flashcards || 0}%`,
-                icon: Brain,
-                color: 'text-purple-500',
-                progress: selectedProject.progress?.flashcards || 0
-              },
-              {
-                label: 'Q&A Progress',
-                value: `${selectedProject.progress?.qa || 0}%`,
-                icon: Target,
-                color: 'text-orange-500',
-                progress: selectedProject.progress?.qa || 0
-              },
-              {
-                label: 'Slides Progress',
-                value: `${selectedProject.progress?.slides || 0}%`,
-                icon: Presentation,
-                color: 'text-green-500',
-                progress: selectedProject.progress?.slides || 0
-              }
-            ].map((stat, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300">
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 rounded-full bg-gray-50 ${stat.color}`}>
-                    <stat.icon className="w-6 h-6" />
-                  </div>
-                  <span className="text-2xl font-bold text-gray-900">{stat.value}</span>
-                </div>
-                <p className="text-sm text-gray-600 mb-2">{stat.label}</p>
-                <div className="w-full bg-gray-100 rounded-full h-2">
-                  <div 
-                    className={`h-2 rounded-full transition-all duration-300 ${
-                      stat.progress < 30 ? 'bg-red-500' :
-                      stat.progress < 70 ? 'bg-yellow-500' :
-                      'bg-green-500'
-                    }`}
-                    style={{ width: `${stat.progress}%` }}
-                  ></div>
-                </div>
-              </div>
-            ))}
-          </div>
+  return (
+    <div className="space-y-6">
+      {/* Welcome / Project Introduction */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to Your Study Project</h2>
+        <p className="text-gray-600">
+          This is a high-level overview of this software. Here you'll find a summary of your learning goals,
+          tools to explore, and a general timeline to help you stay on track.
+        </p>
+      </div>
 
-          {/* Overall Progress Card */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Overall Progress</h2>
-                <p className="text-gray-600 mt-1">Track your learning journey</p>
-              </div>
-              <div className="relative">
-                <svg className="w-24 h-24">
-                  <circle
-                    className="text-gray-200"
-                    strokeWidth="8"
-                    stroke="currentColor"
-                    fill="transparent"
-                    r="44"
-                    cx="48"
-                    cy="48"
-                  />
-                  <circle
-                    className={`${
-                      selectedProject.progress?.overall < 30 ? 'text-red-500' :
-                      selectedProject.progress?.overall < 70 ? 'text-yellow-500' :
-                      'text-green-500'
-                    }`}
-                    strokeWidth="8"
-                    strokeDasharray={`${(selectedProject.progress?.overall || 0) * 2.76} 276`}
-                    strokeLinecap="round"
-                    stroke="currentColor"
-                    fill="transparent"
-                    r="44"
-                    cx="48"
-                    cy="48"
-                  />
-                </svg>
-                <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl font-bold">
-                  {selectedProject.progress?.overall || 0}%
-                </span>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">Project Status</h3>
-                <div className="flex items-center space-x-2">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    selectedProject.status === 'not_started' ? 'bg-gray-100 text-gray-800' :
-                    selectedProject.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                    'bg-green-100 text-green-800'
-                  }`}>
-                    {selectedProject.status === 'not_started' ? 'Not Started' :
-                     selectedProject.status === 'in_progress' ? 'In Progress' :
-                     'Completed'}
-                  </span>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">Last Activity</h3>
-                <p className="text-gray-600">
-                  {new Date(selectedProject.lastActivity).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </p>
-              </div>
-            </div>
-          </div>
+      {/* Learning Goals */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">Learning Goals</h3>
+        <ul className="list-disc list-inside text-gray-700 space-y-2">
+          <li>Understand key concepts and definitions</li>
+          <li>Review flashcards and quiz yourself</li>
+          <li>Read supporting material and summaries</li>
+          <li>Reflect on each module with brief notes</li>
+        </ul>
+      </div>
 
-          {/* Quick Actions */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { id: 'upload', label: 'Materials', icon: Upload },
-                { id: 'study-plan', label: 'Study Plan', icon: Calendar },
-                { id: 'flashcards', label: 'Flashcards', icon: Brain },
-                { id: 'qa', label: 'Q&A Review', icon: Target },
-                { id: 'slides', label: 'Slides', icon: Presentation },
-                { id: 'roadmap', label: 'Roadmap', icon: Map },
-                { id: 'speech', label: 'Speech-to-Text', icon: Mic }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setCurrentView(tab.id)}
-                  className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                >
-                  <tab.icon className="w-8 h-8 mb-2" />
-                  <span className="text-sm font-medium">{tab.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+      {/* Recommended Tools */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+        <h3 className="text-xl font-semibold text-gray-900 mb-4">Tools</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-gray-700">
+          <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">Flashcards App</div>
+          <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">Define Study Plan</div>
+          <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">Generate summaries</div>
+          <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">Q & A Review</div>
+          <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">Slides</div>
+          {/* <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">Task Planner</div> */}
         </div>
-      );
+      </div>
+
+      {/* Timeline Preview */}
+      
+
+      {/* Encouragement Message */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
+        <h3 className="text-xl font-semibold text-blue-800">You're all set!</h3>
+        <p className="text-blue-700 mt-2">
+          Take it one step at a time and enjoy the learning journey.
+        </p>
+      </div>
+    </div>
+  );
 
       case 'upload':
         return (
