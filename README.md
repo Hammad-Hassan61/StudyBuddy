@@ -1,5 +1,8 @@
 # Study Buddy
 
+## Deployed URL:
+`http://13.54.223.152`
+
 ## Backend GitHub Repo:
 `https://github.com/Hammad-Hassan61/StudyBuddy-Server`
 
