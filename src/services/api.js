@@ -1,4 +1,4 @@
-export const BACKEND_URL = "https://10ea-13-54-223-152.ngrok-free.app/api/auth/google/callback";
+export const BACKEND_URL = "https://de14-13-54-223-152.ngrok-free.app";
 
 export const API_ROUTES = {
     AUTH: {
