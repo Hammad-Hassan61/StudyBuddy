@@ -6,19 +6,18 @@ import {
   Brain, 
   Target, 
   Presentation, 
-  Map, 
-  Mic 
+  
 } from 'lucide-react';
 
 const projectTabs = [
   { id: 'overview', label: 'Overview', icon: BarChart3 },
+  { id: 'summary', label: 'Summary', icon: Target },
   { id: 'upload', label: 'Materials', icon: Upload },
   { id: 'study-plan', label: 'Study Plan', icon: Calendar },
   { id: 'flashcards', label: 'Flashcards', icon: Brain },
   { id: 'qa', label: 'Q&A Review', icon: Target },
   { id: 'slides', label: 'Slides', icon: Presentation },
-  { id: 'roadmap', label: 'Roadmap', icon: Map },
-  { id: 'speech', label: 'Speech-to-Text', icon: Mic }
+  
 ];
 
 const ProjectNavigation = ({ currentView, onTabChange }) => {

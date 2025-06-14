@@ -22,8 +22,8 @@ const ProjectContent = ({
   studyPlanContent,
   flashcardsContent,
   qaContent,
-  roadmapContent,
   slidesContent,
+  summaryContent,
   aiLoading,
   isUploading,
   uploadProgress,
@@ -35,6 +35,14 @@ const ProjectContent = ({
   setShowPdfViewer,
   BACKEND_URL
 }) => {
+  const [currentSlide, setCurrentSlide] = React.useState(0);
+  function cleanContent(raw) {
+    if (raw.startsWith('{"content":"') && raw.endsWith('"}')) {
+      return raw.slice(12, -2); // remove first 12 characters and last 2 characters
+    }
+    return raw;
+  }
+
   if (!selectedProject) return null;
 
   
@@ -407,14 +415,14 @@ const ProjectContent = ({
               </button>
             </div>
   
-            {studyPlanContent ? (
+            {studyPlanContent && studyPlanContent.content && Array.isArray(studyPlanContent.content) ? (
               <div className="relative">
                 {/* Tree Structure Container */}
                 <div className="relative flex flex-col items-center space-y-8">
                   {/* Vertical Line - Main Tree Trunk */}
                   <div className="absolute left-1/2 top-0 w-1 bg-gradient-to-b from-blue-200 via-blue-300 to-blue-400 transform -translate-x-1/2 h-full"></div>
                   
-                  {studyPlanContent.map((phase, index) => (
+                  {studyPlanContent.content.map((phase, index) => (
                     <div key={index} className="relative w-full max-w-6xl">
                       {/* Branch Line */}
                       <div className={`absolute top-1/2 transform -translate-y-1/2 w-16 h-0.5 ${
@@ -639,7 +647,7 @@ const ProjectContent = ({
         );
     
         case 'flashcards':
-          return (
+      return (
             <div className="space-y-8">
               <div className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 rounded-3xl shadow-xl border border-blue-100/50 backdrop-blur-sm">
                 {/* Background decoration */}
@@ -664,20 +672,20 @@ const ProjectContent = ({
                       </div>
                     </div>
                     
-                    {flashcardsContent && (
-                      <button
-                        onClick={() => generateAIContent('flashcards')}
+              {flashcardsContent && (
+                <button 
+                  onClick={() => generateAIContent('flashcards')}
                         className="group relative bg-white border border-blue-200 text-blue-600 px-6 py-3 rounded-xl font-semibold hover:bg-blue-50 hover:border-blue-300 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex items-center space-x-2"
-                      >
+                >
                         <Zap className="w-5 h-5 group-hover:text-blue-700 transition-colors" />
                         <span className="group-hover:text-blue-700 transition-colors">Regenerate</span>
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
-                      </button>
-                    )}
-                  </div>
+                </button>
+              )}
+            </div>
         
                   {/* Empty State */}
-                  {!flashcardsContent && !aiLoading && (
+            {!flashcardsContent && !aiLoading && (
                     <div className="text-center py-12">
                       <div className="relative mb-8">
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-10 blur-2xl" />
@@ -693,8 +701,8 @@ const ProjectContent = ({
                         Transform your uploaded materials into interactive flashcards for effective memorization and review.
                       </p>
                       
-                      <button
-                        onClick={() => generateAIContent('flashcards')}
+                <button 
+                  onClick={() => generateAIContent('flashcards')}
                         className="group relative bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-10 py-4 rounded-2xl font-bold hover:from-blue-700 hover:to-cyan-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 transform"
                       >
                         <span className="relative z-10 flex items-center space-x-2">
@@ -702,12 +710,12 @@ const ProjectContent = ({
                           <span>Generate Flashcards</span>
                         </span>
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-cyan-700 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      </button>
-                    </div>
-                  )}
+                </button>
+              </div>
+            )}
         
                   {/* Loading State */}
-                  {aiLoading && currentView === 'flashcards' && (
+            {aiLoading && currentView === 'flashcards' && (
                     <div className="text-center py-16">
                       <div className="relative mb-6">
                         <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full opacity-20 blur-xl animate-pulse" />
@@ -725,8 +733,8 @@ const ProjectContent = ({
                         <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                         <div className="w-2 h-2 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                       </div>
-                    </div>
-                  )}
+              </div>
+            )}
         
                   {/* Flashcards Content */}
                   {flashcardsContent && flashcardsContent.content && flashcardsContent.content.length > 0 && (
@@ -748,16 +756,16 @@ const ProjectContent = ({
                       </div>
                       
                       <div className="bg-gradient-to-br from-slate-50 to-blue-50/30 rounded-2xl p-6 border border-blue-100/50">
-                        <FlashcardDisplay cards={flashcardsContent.content} />
+              <FlashcardDisplay cards={flashcardsContent.content} />
                       </div>
                     </div>
-                  )}
+            )}
                 </div>
-              </div>
-            </div>
-          );
-      case 'qa':
-        return (
+          </div>
+        </div>
+      );
+    case 'qa':
+      return (
           <div className="space-y-8">
             <div className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/30 to-cyan-50/20 rounded-3xl shadow-xl border border-blue-100/50 backdrop-blur-sm">
               {/* Background decoration */}
@@ -782,20 +790,20 @@ const ProjectContent = ({
                     </div>
                   </div>
                   
-                  {qaContent && (
-                    <button
-                      onClick={() => generateAIContent('qa')}
+              {qaContent && (
+                <button 
+                  onClick={() => generateAIContent('qa')}
                       className="group relative bg-white border border-blue-200 text-blue-600 px-6 py-3 rounded-xl font-semibold hover:bg-blue-50 hover:border-blue-300 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex items-center space-x-2"
-                    >
+                >
                       <Zap className="w-5 h-5 group-hover:text-blue-700 transition-colors" />
                       <span className="group-hover:text-blue-700 transition-colors">Regenerate</span>
                       <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl opacity-0 group-hover:opacity-5 transition-opacity duration-300" />
-                    </button>
-                  )}
-                </div>
+                </button>
+              )}
+            </div>
       
                 {/* Empty State */}
-                {!qaContent && !aiLoading && (
+            {!qaContent && !aiLoading && (
                   <div className="text-center py-12">
                     <div className="relative mb-8">
                       <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-10 blur-2xl" />
@@ -809,8 +817,8 @@ const ProjectContent = ({
                       Generate comprehensive questions and answers from your uploaded materials to reinforce your learning.
                     </p>
                     
-                    <button
-                      onClick={() => generateAIContent('qa')}
+                <button 
+                  onClick={() => generateAIContent('qa')}
                       className="group relative bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-10 py-4 rounded-2xl font-bold hover:from-blue-700 hover:to-cyan-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 transform"
                     >
                       <span className="relative z-10 flex items-center space-x-2">
@@ -818,156 +826,366 @@ const ProjectContent = ({
                         <span>Generate Q&A Session</span>
                       </span>
                       <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-cyan-700 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </button>
-                  </div>
-                )}
+                </button>
+              </div>
+            )}
       
                 {/* Loading State */}
-                {aiLoading && currentView === 'qa' && (
+            {aiLoading && currentView === 'qa' && (
                   <div className="text-center py-16">
                     <div className="relative mb-6">
                       <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full opacity-20 blur-xl animate-pulse" />
                       <div className="relative w-16 h-16 mx-auto">
                         <div className="absolute inset-0 border-4 border-blue-200 rounded-full opacity-30" />
                         <div className="absolute inset-0 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-                      </div>
-                    </div>
-                    
-                    <h3 className="text-xl font-semibold text-blue-700 mb-2">Crafting Your Questions</h3>
-                    <p className="text-blue-600">Analyzing your materials and generating thoughtful Q&A pairs...</p>
-                    
-                    <div className="mt-6 flex justify-center space-x-1">
-                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <div className="w-2 h-2 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                    </div>
+              </div>
                   </div>
-                )}
+                  
+                  <h3 className="text-xl font-semibold text-blue-700 mb-2">Crafting Your Questions</h3>
+                  <p className="text-blue-600">Analyzing your materials and generating thoughtful Q&A pairs...</p>
+              </div>
+            )}
       
                 {/* Q&A Content */}
                 {qaContent && qaContent.content && qaContent.content.length > 0 && (
-                  <div className="mt-6 text-left space-y-6">
-                    {qaContent.content.map((item, index) => (
-                      <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <p className="font-semibold text-gray-800 mb-2">Q: {item.question}</p>
-                        <p className="text-gray-700">A: {item.answer}</p>
-                      </div>
-                    ))}
+              <div className="mt-6 text-left space-y-6">
+                {qaContent.content.map((item, index) => (
+                  <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <p className="font-semibold text-gray-800 mb-2">Q: {item.question}</p>
+                    <p className="text-gray-700">A: {item.answer}</p>
                   </div>
-                )}
+                ))}
               </div>
-            </div>
+            )}
+              </div>
           </div>
-        );
+        </div>
+      );
 
     case 'slides':
       return (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
-            <div className="flex items-center justify-between mb-4">
-              <Presentation className="w-16 h-16 text-purple-500 mx-auto" />
+            <div className="space-y-8">
+              {/* Main Container with Enhanced Glassmorphism */}
+              <div className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/40 to-cyan-50/30 rounded-3xl shadow-2xl border border-blue-100/60 backdrop-blur-xl">
+                {/* Enhanced Background Decorations */}
+                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-blue-300/25 to-transparent rounded-full -mr-20 -mt-20 animate-pulse" />
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-cyan-300/25 to-transparent rounded-full -ml-16 -mb-16 animate-pulse" style={{ animationDelay: '1s' }} />
+                <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-gradient-to-r from-blue-200/15 to-cyan-200/15 rounded-full blur-xl animate-float" />
+                
+                <div className="relative p-10">
+                  {/* Enhanced Header */}
+                  <div className="flex items-center justify-between mb-10">
+                    <div className="flex items-center space-x-5">
+                      <div className="relative group">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl opacity-20 blur-xl group-hover:opacity-30 transition-opacity duration-300" />
+                        <div className="relative bg-gradient-to-r from-blue-500 to-cyan-500 p-5 rounded-3xl shadow-lg group-hover:shadow-xl transform group-hover:scale-105 transition-all duration-300">
+                          <Presentation className="w-12 h-12 text-white" />
+                        </div>
+                      </div>
+                      <div>
+                        <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-600 bg-clip-text text-transparent mb-1">
+                          Presentation Slides
+                        </h2>
+                        <p className="text-slate-600 text-lg font-medium">Comprehensive study materials</p>
+                      </div>
+                    </div>
+                    
               {slidesContent && (
                 <button 
                   onClick={() => generateAIContent('slides')}
-                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
+                        className="group relative bg-white/90 backdrop-blur-sm border border-blue-200/60 text-blue-600 px-8 py-4 rounded-2xl font-bold hover:bg-blue-50/80 hover:border-blue-300/80 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex items-center space-x-3"
                 >
-                  <Zap className="w-4 h-4" />
-                  <span>Regenerate</span>
+                        <Zap className="w-6 h-6 group-hover:text-blue-700 transition-colors group-hover:rotate-12" />
+                        <span className="group-hover:text-blue-700 transition-colors text-lg">Regenerate</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
                 </button>
               )}
             </div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">AI-Generated Slides</h2>
+    
+                  {/* Enhanced Empty State */}
             {!slidesContent && !aiLoading && (
-              <div className="py-4">
-                <p className="text-gray-600 mb-6">Generate presentation slides based on your uploaded materials.</p>
+                    <div className="text-center py-16">
+                      <div className="relative mb-10">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-15 blur-3xl animate-pulse" />
+                        <div className="relative bg-gradient-to-br from-blue-100/80 to-cyan-100/80 backdrop-blur-sm p-10 rounded-full w-32 h-32 mx-auto flex items-center justify-center shadow-xl border border-blue-200/50">
+                          <Presentation className="w-16 h-16 text-blue-600" />
+                        </div>
+                      </div>
+                      
+                      <h3 className="text-2xl font-bold text-slate-800 mb-4">Create Your Study Slides</h3>
+                      <p className="text-slate-600 text-lg mb-10 max-w-lg mx-auto leading-relaxed">
+                        Transform your study materials into beautiful, comprehensive presentation slides for enhanced learning.
+                      </p>
+                      
                 <button 
                   onClick={() => generateAIContent('slides')}
-                  className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-                >
-                  Generate Slides
+                        className="group relative bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-12 py-5 rounded-3xl font-bold text-lg hover:from-blue-700 hover:to-cyan-700 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 transform"
+                      >
+                        <span className="relative z-10 flex items-center space-x-3">
+                          <Presentation className="w-6 h-6" />
+                          <span>Generate Slides</span>
+                        </span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-cyan-700 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute inset-0 bg-white rounded-3xl opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
                 </button>
               </div>
             )}
+    
+                  {/* Enhanced Loading State */}
             {aiLoading && currentView === 'slides' && (
-              <div className="py-4">
-                <div className="animate-spin w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-blue-600">Generating slides, please wait...</p>
+                    <div className="text-center py-20">
+                      <div className="relative mb-8">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full opacity-25 blur-2xl animate-pulse" />
+                        <div className="relative w-20 h-20 mx-auto">
+                          <div className="absolute inset-0 border-4 border-blue-200/40 rounded-full" />
+                          <div className="absolute inset-0 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                          <div className="absolute inset-2 border-2 border-cyan-400 border-r-transparent rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+                        </div>
+                      </div>
+                      
+                      <h3 className="text-2xl font-bold text-blue-700 mb-3">Creating Your Slides</h3>
+                      <p className="text-blue-600 text-lg">Processing materials and crafting beautiful slides...</p>
+                      
+                      <div className="mt-8 flex justify-center space-x-2">
+                        <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '200ms' }} />
+                        <div className="w-3 h-3 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: '400ms' }} />
+                      </div>
               </div>
             )}
-            {slidesContent && slidesContent.content && (
-              <div className="mt-6 overflow-x-auto flex space-x-4 p-4 rounded-lg bg-gray-50 border border-gray-200">
-                {slidesContent.content.map((slideHtml, index) => (
+    
+                  {/* Enhanced Slides Content */}
+                  {slidesContent && slidesContent.content && slidesContent.content.length > 0 && (
+                    <div className="space-y-8">
+                      {/* Slides Header */}
+                     
+                      
+                      {/* Presentation Style Slides */}
+                      <div className="relative bg-gradient-to-br from-slate-50/80 to-blue-50/40 backdrop-blur-sm rounded-3xl p-8 border border-blue-100/60 shadow-inner">
+                        {/* Main Slide Display */}
+                        <div className="relative aspect-[16/9] bg-white rounded-2xl shadow-2xl overflow-hidden">
+                          {slidesContent.content.map((slide, index) => (
                   <div 
                     key={index} 
-                    className="flex-none w-96 h-64 bg-white rounded-lg shadow-md border border-gray-100 p-4 flex items-center justify-center"
-                    dangerouslySetInnerHTML={{ __html: slideHtml }}
-                  ></div>
-                ))}
+                              className={`absolute inset-0 transition-opacity duration-500 ${
+                                index === currentSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                              }`}
+                            >
+                              <div className="h-full w-full p-8">
+                                <div 
+                                  className="prose prose-blue prose-lg max-w-none h-full prose-headings:text-slate-800 prose-headings:font-bold prose-p:text-slate-600 prose-p:leading-relaxed prose-strong:text-blue-700 prose-em:text-cyan-600 prose-img:my-0 prose-img:max-h-[calc(100%-2rem)] prose-img:object-contain"
+                                  dangerouslySetInnerHTML={{ __html: slide.html }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Navigation Controls */}
+                        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex items-center space-x-4 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full shadow-lg border border-blue-100/60 mb-4">
+                          <button
+                            onClick={() => setCurrentSlide(prev => Math.max(0, prev - 1))}
+                            disabled={currentSlide === 0}
+                            className="p-2 rounded-full hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                          </button>
+                          
+                          <div className="flex items-center space-x-2">
+                            {slidesContent.content.map((_, index) => (
+                              <button
+                                key={index}
+                                onClick={() => setCurrentSlide(index)}
+                                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                                  index === currentSlide 
+                                    ? 'bg-blue-600 w-4' 
+                                    : 'bg-blue-200 hover:bg-blue-400'
+                                }`}
+                              />
+                            ))}
+                          </div>
+
+                          <button
+                            onClick={() => setCurrentSlide(prev => Math.min(slidesContent.content.length - 1, prev + 1))}
+                            disabled={currentSlide === slidesContent.content.length - 1}
+                            className="p-2 rounded-full hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          </button>
+                        </div>
+
+                        {/* Slide Counter */}
+                        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-blue-100/60">
+                          <span className="text-blue-600 font-semibold">
+                            {currentSlide + 1} / {slidesContent.content.length}
+                          </span>
+                        </div>
+                      </div>
               </div>
             )}
+                </div>
           </div>
         </div>
       );
-
-    case 'roadmap':
+    case 'summary':
       return (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
-            <div className="flex items-center justify-between mb-4">
-              <Map className="w-16 h-16 text-indigo-500 mx-auto" />
-              {roadmapContent && (
+        <div className="space-y-8">
+          <div className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/40 to-cyan-50/30 rounded-3xl shadow-2xl border border-blue-100/60 backdrop-blur-xl">
+            {/* Background decoration */}
+            <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-blue-300/25 to-transparent rounded-full -mr-20 -mt-20 animate-pulse" />
+            <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-cyan-300/25 to-transparent rounded-full -ml-16 -mb-16 animate-pulse" style={{ animationDelay: '1s' }} />
+            
+            <div className="relative p-10">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center space-x-4">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl opacity-20 blur-lg" />
+                    <div className="relative bg-gradient-to-r from-blue-500 to-cyan-500 p-4 rounded-2xl">
+                      <FileText className="w-10 h-10 text-white" />
+                    </div>
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-700 to-cyan-700 bg-clip-text text-transparent">
+                      Document Summary
+                    </h2>
+                    <p className="text-slate-600 mt-1">Concise overview of your study materials</p>
+                  </div>
+                </div>
+                
+                {summaryContent && (
                 <button 
-                  onClick={() => generateAIContent('roadmap')}
-                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
+                    onClick={() => generateAIContent('summary')}
+                    className="group relative bg-white/90 backdrop-blur-sm border border-blue-200/60 text-blue-600 px-6 py-3 rounded-xl font-semibold hover:bg-blue-50/80 hover:border-blue-300/80 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 flex items-center space-x-2"
                 >
-                  <Zap className="w-4 h-4" />
-                  <span>Regenerate</span>
+                    <Zap className="w-5 h-5 group-hover:text-blue-700 transition-colors" />
+                    <span className="group-hover:text-blue-700 transition-colors">Regenerate</span>
                 </button>
               )}
             </div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Learning Roadmap</h2>
-            {!roadmapContent && !aiLoading && (
-              <div className="py-4">
-                <p className="text-gray-600 mb-6">Generate a personalized learning roadmap with key milestones.</p>
+
+              {/* Empty State */}
+              {!summaryContent && !aiLoading && (
+                <div className="text-center py-12">
+                  <div className="relative mb-8">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full opacity-10 blur-2xl" />
+                    <div className="relative bg-gradient-to-br from-blue-100 to-cyan-100 p-8 rounded-full w-24 h-24 mx-auto flex items-center justify-center">
+                      <FileText className="w-12 h-12 text-blue-600" />
+                    </div>
+                  </div>
+                  
+                  <h3 className="text-xl font-semibold text-slate-800 mb-3">Create Document Summary</h3>
+                  <p className="text-slate-600 mb-8 max-w-md mx-auto leading-relaxed">
+                    Generate a comprehensive summary of your study materials to get a quick overview of the key concepts.
+                  </p>
+                  
                 <button 
-                  onClick={() => generateAIContent('roadmap')}
-                  className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                    onClick={() => generateAIContent('summary')}
+                    className="group relative bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-10 py-4 rounded-2xl font-bold hover:from-blue-700 hover:to-cyan-700 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 transform"
                 >
-                  Generate Roadmap
+                    <span className="relative z-10 flex items-center space-x-2">
+                      <FileText className="w-5 h-5" />
+                      <span>Generate Summary</span>
+                    </span>
                 </button>
               </div>
             )}
-            {aiLoading && currentView === 'roadmap' && (
-              <div className="py-4">
-                <div className="animate-spin w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-blue-600">Generating roadmap, please wait...</p>
-              </div>
-            )}
-            {roadmapContent && roadmapContent.content && (
-              <div className="mt-6 text-left space-y-6">
-                {roadmapContent.content.map((item, index) => (
-                  <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <h3 className="font-semibold text-gray-800 mb-1">{item.milestone}</h3>
-                    <p className="text-gray-700">{item.description}</p>
-                    {item.eta && <p className="text-sm text-gray-500 mt-1">ETA: {item.eta}</p>}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      );
 
-    case 'speech':
-      return (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
-            <Mic className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Speech-to-Text</h2>
-            <p className="text-gray-600 mb-6">Convert your lectures and voice notes into searchable text</p>
-            <button className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-              Start Recording
-            </button>
+              {/* Loading State */}
+              {aiLoading && currentView === 'summary' && (
+                <div className="text-center py-16">
+                  <div className="relative mb-6">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full opacity-20 blur-xl animate-pulse" />
+                    <div className="relative w-16 h-16 mx-auto">
+                      <div className="absolute inset-0 border-4 border-blue-200 rounded-full opacity-30" />
+                      <div className="absolute inset-0 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+              </div>
+                  </div>
+                  
+                  <h3 className="text-xl font-semibold text-blue-700 mb-2">Creating Summary</h3>
+                  <p className="text-blue-600">Analyzing your materials and generating a comprehensive summary...</p>
+              </div>
+            )}
+
+              {/* Summary Content */}
+              {summaryContent && summaryContent.content && (
+                <div className="space-y-6">
+                  <div className="bg-white rounded-2xl shadow-lg border border-blue-100/60 p-8">
+                    <div className="prose prose-blue max-w-none">
+                      <style>
+                        {`
+                          .prose h1 {
+                            color: #1e40af;
+                            font-size: 2.25rem;
+                            font-weight: 700;
+                            margin-top: 2rem;
+                            margin-bottom: 1rem;
+                          }
+                          .prose h2 {
+                            color: #2563eb;
+                            font-size: 1.875rem;
+                            font-weight: 600;
+                            margin-top: 1.75rem;
+                            margin-bottom: 0.75rem;
+                          }
+                          .prose h3 {
+                            color: #3b82f6;
+                            font-size: 1.5rem;
+                            font-weight: 600;
+                            margin-top: 1.5rem;
+                            margin-bottom: 0.5rem;
+                          }
+                          .prose p {
+                            color: #1f2937;
+                            font-size: 1.125rem;
+                            line-height: 1.75;
+                            margin-bottom: 1rem;
+                          }
+                          .prose ul {
+                            list-style-type: disc;
+                            margin-left: 1.5rem;
+                            margin-bottom: 1rem;
+                          }
+                          .prose li {
+                            color: #1f2937;
+                            font-size: 1.125rem;
+                            line-height: 1.75;
+                            margin-bottom: 0.5rem;
+                          }
+                          .prose strong {
+                            color: #1e40af;
+                            font-weight: 600;
+                          }
+                          .prose em {
+                            color: #3b82f6;
+                            font-style: italic;
+                          }
+                          .prose .example {
+                            background-color: #f0f9ff;
+                            border-left: 4px solid #3b82f6;
+                            padding: 1rem;
+                            margin: 1rem 0;
+                            border-radius: 0.5rem;
+                          }
+                          .prose .note {
+                            background-color: #fef3c7;
+                            border-left: 4px solid #f59e0b;
+                            padding: 1rem;
+                            margin: 1rem 0;
+                            border-radius: 0.5rem;
+                          }
+                        `}
+                      </style>
+                      <div dangerouslySetInnerHTML={{ __html: cleanContent(summaryContent.content) }} />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       );

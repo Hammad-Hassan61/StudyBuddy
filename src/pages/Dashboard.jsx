@@ -65,8 +65,8 @@ export default function StudyBuddyDashboard() {
   const [studyPlanContent, setStudyPlanContent] = useState(null);
   const [flashcardsContent, setFlashcardsContent] = useState(null);
   const [qaContent, setQaContent] = useState(null);
-  const [roadmapContent, setRoadmapContent] = useState(null);
   const [slidesContent, setSlidesContent] = useState(null);
+  const [summaryContent, setSummaryContent] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
 
@@ -121,59 +121,56 @@ export default function StudyBuddyDashboard() {
   // Effect to fetch AI content when project or view changes
   useEffect(() => {
     const fetchAIContent = async () => {
-      if (!selectedProject || !selectedProject._id || !currentView) return;
-
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
+      if (!selectedProject) return;
 
       try {
-        setAiLoading(true);
-        let response;
-        switch (currentView) {
-          case 'study-plan':
-            if (!studyPlanContent) {
-              response = await axios.get(API_ROUTES.AI_CONTENT.GET_STUDY_PLAN(selectedProject._id), { headers });
-              // Make sure we're setting the content array, not the whole study plan object
-              setStudyPlanContent(response.data.content || []);
-              setStudyPlanId(response.data._id);
-            }
-            break;
-          case 'flashcards':
-            if (!flashcardsContent) {
-              response = await axios.get(API_ROUTES.AI_CONTENT.GET_FLASHCARDS(selectedProject._id), { headers });
-              setFlashcardsContent(response.data);
-            }
-            break;
-          case 'qa':
-            if (!qaContent) {
-              response = await axios.get(API_ROUTES.AI_CONTENT.GET_QA(selectedProject._id), { headers });
-              setQaContent(response.data);
-            }
-            break;
-          case 'roadmap':
-            if (!roadmapContent) {
-              response = await axios.get(API_ROUTES.AI_CONTENT.GET_ROADMAP(selectedProject._id), { headers });
-              setRoadmapContent(response.data.content);
-            }
-            break;
-          case 'slides':
-            if (!slidesContent) {
-              response = await axios.get(API_ROUTES.AI_CONTENT.GET_SLIDES(selectedProject._id), { headers });
-              setSlidesContent(response.data.content);
-            }
-            break;
-          default:
-            break;
+        const token = localStorage.getItem('token');
+        if (!token) {
+          showToast('Please log in to access this feature', 'error');
+          return;
+        }
+
+        const headers = {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        };
+
+        // Fetch all content types in parallel
+        const [studyPlanRes, flashcardsRes, qaRes, slidesRes, summaryRes] = await Promise.all([
+          fetch(`${BACKEND_URL}/api/ai/projects/${selectedProject._id}/study-plan`, { headers }),
+          fetch(`${BACKEND_URL}/api/ai/projects/${selectedProject._id}/flashcards`, { headers }),
+          fetch(`${BACKEND_URL}/api/ai/projects/${selectedProject._id}/qa`, { headers }),
+          fetch(`${BACKEND_URL}/api/ai/projects/${selectedProject._id}/slides`, { headers }),
+          fetch(`${BACKEND_URL}/api/ai/projects/${selectedProject._id}/summary`, { headers })
+        ]);
+
+        if (studyPlanRes.ok) {
+          const data = await studyPlanRes.json();
+          setStudyPlanContent({ content: data.content || [] });
+        }
+        if (flashcardsRes.ok) {
+          const data = await flashcardsRes.json();
+          setFlashcardsContent(data);
+        }
+        if (qaRes.ok) {
+          const data = await qaRes.json();
+          setQaContent(data);
+        }
+        if (slidesRes.ok) {
+          const data = await slidesRes.json();
+          setSlidesContent(data);
+        }
+        if (summaryRes.ok) {
+          const data = await summaryRes.json();
+          setSummaryContent(data);
         }
       } catch (error) {
-        console.error(`Error fetching AI content for ${currentView}:`, error);
-        // Handle error: e.g., clear content, show message
-      } finally {
-        setAiLoading(false);
+        console.error('Error fetching AI content:', error);
+        showToast('Failed to fetch content', 'error');
       }
     };
     fetchAIContent();
-  }, [selectedProject, currentView]); // Depend on selectedProject and currentView
+  }, [selectedProject]);
 
   const fetchProjects = async () => {
     try {
@@ -260,31 +257,41 @@ export default function StudyBuddyDashboard() {
 
   const generateAIContent = async (contentType) => {
     if (!selectedProject) {
-      showToast('Please select a project first.', 'error');
+      showToast('Please select a project first', 'error');
       return;
     }
 
     if (!selectedProject.extractedTextContent) {
-      showToast('Please upload study materials before generating content.', 'error');
+      showToast('Please upload study materials first', 'error');
       return;
     }
 
-    setAiLoading(true);
-    // Clear previous content state for the current type before generating new one
+    // Clear previous content based on type
     switch (contentType) {
         case 'study-plan': 
           setStudyPlanContent(null); 
-          setStudyPlanId(null);
+        break;
+      case 'flashcards':
+        setFlashcardsContent(null);
+        break;
+      case 'qa':
+        setQaContent(null);
+        break;
+      case 'slides':
+        setSlidesContent(null);
+        break;
+      case 'summary':
+        setSummaryContent(null);
           break;
-        case 'flashcards': setFlashcardsContent(null); break;
-        case 'qa': setQaContent(null); break;
-        case 'roadmap': setRoadmapContent(null); break;
-        case 'slides': setSlidesContent(null); break;
-        default: break;
     }
+
+    setAiLoading(true);
+    setCurrentView(contentType);
 
     try {
       const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
       const payload = {
         projectId: selectedProject._id,
         contentInput: selectedProject.extractedTextContent,
@@ -295,37 +302,31 @@ export default function StudyBuddyDashboard() {
       let response;
       switch (contentType) {
         case 'study-plan':
-          response = await axios.post(API_ROUTES.AI_GENERATE.STUDY_PLAN, payload, { headers: { Authorization: `Bearer ${token}` } });
-          setStudyPlanContent(response.data.data.content || []);
-          setStudyPlanId(response.data.data._id);
-          showToast('Study plan generated successfully!', 'success');
+          response = await axios.post(API_ROUTES.AI_GENERATE.STUDY_PLAN, payload, { headers });
+          setStudyPlanContent(response.data.data);
           break;
         case 'flashcards':
-          response = await axios.post(API_ROUTES.AI_GENERATE.FLASHCARDS, payload, { headers: { Authorization: `Bearer ${token}` } });
+          response = await axios.post(API_ROUTES.AI_GENERATE.FLASHCARDS, payload, { headers });
           setFlashcardsContent(response.data.data);
-          showToast('Flashcards generated successfully!', 'success');
           break;
         case 'qa':
-          response = await axios.post(API_ROUTES.AI_GENERATE.QA, payload, { headers: { Authorization: `Bearer ${token}` } });
+          response = await axios.post(API_ROUTES.AI_GENERATE.QA, payload, { headers });
           setQaContent(response.data.data);
-          showToast('Q&A generated successfully!', 'success');
-          break;
-        case 'roadmap':
-          response = await axios.post(API_ROUTES.AI_GENERATE.ROADMAP, payload, { headers: { Authorization: `Bearer ${token}` } });
-          setRoadmapContent(response.data.data.content);
-          showToast('Roadmap generated successfully!', 'success');
           break;
         case 'slides':
-          response = await axios.post(API_ROUTES.AI_GENERATE.SLIDES, payload, { headers: { Authorization: `Bearer ${token}` } });
-          setSlidesContent(response.data.data.content);
-          showToast('Slides generated successfully!', 'success');
+          response = await axios.post(API_ROUTES.AI_GENERATE.SLIDES, payload, { headers });
+          setSlidesContent(response.data.data);
           break;
-        default:
+        case 'summary':
+          response = await axios.post(API_ROUTES.AI_GENERATE.SUMMARY, payload, { headers });
+          setSummaryContent(response.data.data);
           break;
       }
+
+      showToast(`${contentType.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} generated successfully!`, 'success');
     } catch (error) {
-      console.error(`Error generating ${contentType}:`, error);
-      showToast(`Failed to generate ${contentType}. Please try again.`, 'error');
+      console.error('Error generating content:', error);
+      showToast(error.response?.data?.message || 'Failed to generate content', 'error');
     } finally {
       setAiLoading(false);
     }
@@ -471,8 +472,8 @@ export default function StudyBuddyDashboard() {
               studyPlanContent={studyPlanContent}
               flashcardsContent={flashcardsContent}
               qaContent={qaContent}
-              roadmapContent={roadmapContent}
               slidesContent={slidesContent}
+              summaryContent={summaryContent}
               aiLoading={aiLoading}
               isUploading={isUploading}
               uploadProgress={uploadProgress}

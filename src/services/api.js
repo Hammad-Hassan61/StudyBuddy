@@ -17,6 +17,7 @@ export const API_ROUTES = {
         QA: `${BACKEND_URL}/api/ai/generate/qa`,
         ROADMAP: `${BACKEND_URL}/api/ai/generate/roadmap`,
         SLIDES: `${BACKEND_URL}/api/ai/generate/slides`,
+        SUMMARY: `${BACKEND_URL}/api/ai/generate/summary`,
     },
     AI_CONTENT: {
         GET_STUDY_PLAN: (projectId) => `${BACKEND_URL}/api/ai/projects/${projectId}/study-plan`,
