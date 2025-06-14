@@ -3,6 +3,7 @@ import { BookOpen, Clock, Brain, Zap, Upload, Users, Mic, FileText, Target, Ligh
 import { FaGoogle } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { BACKEND_URL } from '../services/api';
+import { useUser } from '../UserContext';
 
 const GOOGLE_AUTH_URL = `${BACKEND_URL}/api/auth/google`;
 
@@ -11,6 +12,14 @@ const StudyBuddyLanding = () => {
   const [activeFeature, setActiveFeature] = useState(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const navigate = useNavigate();
+  const { user, loading } = useUser();
+
+  // Redirect to dashboard if user is logged in
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/dashboard');
+    }
+  }, [user, loading, navigate]);
 
   useEffect(() => {
     setIsVisible(true);
@@ -31,6 +40,11 @@ const StudyBuddyLanding = () => {
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
   }, [navigate]);
+
+  // If still loading or user is logged in, show nothing
+  if (loading || user) {
+    return null;
+  }
 
   const openGoogleAuth = () => {
     // Open Google OAuth in a new window
