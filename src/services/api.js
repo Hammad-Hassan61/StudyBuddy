@@ -1,4 +1,4 @@
-export const BACKEND_URL = "https://f365-13-54-223-152.ngrok-free.app";
+export const BACKEND_URL = "http://localhost:5000";
 
 export const API_ROUTES = {
     AUTH: {
