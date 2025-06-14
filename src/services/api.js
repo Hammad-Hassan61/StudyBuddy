@@ -1,4 +1,4 @@
-export const BACKEND_URL = "http://localhost:5000";
+export const BACKEND_URL = "https://study-buddy-server-eight.vercel.app";
 
 export const API_ROUTES = {
     AUTH: {
