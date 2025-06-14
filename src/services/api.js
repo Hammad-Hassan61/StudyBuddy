@@ -1,4 +1,4 @@
-export const BACKEND_URL = 'http://localhost:5000';
+export const BACKEND_URL = 'http://13.54.223.152';
 
 export const API_ROUTES = {
     AUTH: {
