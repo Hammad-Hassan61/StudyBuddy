@@ -40,6 +40,9 @@ const ProjectContent = ({
     if (raw.startsWith('{"content":"') && raw.endsWith('"}')) {
       return raw.slice(12, -2); // remove first 12 characters and last 2 characters
     }
+    if (raw.startsWith('{"response":') && raw.endsWith('}')) {
+      return raw.slice(13, -2); // remove first 11 characters and last 1 character
+    }
     return raw;
   }
 
@@ -595,7 +598,7 @@ const ProjectContent = ({
                                   {phase.status === 'completed' ? (
                                     <span className="flex items-center justify-center">
                                       <CheckCircle className="w-4 h-4 mr-2" />
-                                      Mark as Incomplete
+                                      Completed
                                     </span>
                                   ) : (
                                     <span className="flex items-center justify-center">

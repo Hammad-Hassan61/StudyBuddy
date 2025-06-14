@@ -10,9 +10,10 @@ import {
 } from 'lucide-react';
 
 const projectTabs = [
-  { id: 'overview', label: 'Overview', icon: BarChart3 },
-  { id: 'summary', label: 'Summary', icon: Target },
+  // { id: 'overview', label: 'Overview', icon: BarChart3 },
   { id: 'upload', label: 'Materials', icon: Upload },
+  { id: 'summary', label: 'Summary', icon: Target },
+  
   { id: 'study-plan', label: 'Study Plan', icon: Calendar },
   { id: 'flashcards', label: 'Flashcards', icon: Brain },
   { id: 'qa', label: 'Q&A Review', icon: Target },

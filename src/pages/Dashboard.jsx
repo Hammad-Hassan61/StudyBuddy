@@ -141,12 +141,13 @@ export default function StudyBuddyDashboard() {
           fetch(`${BACKEND_URL}/api/ai/projects/${selectedProject._id}/flashcards`, { headers }),
           fetch(`${BACKEND_URL}/api/ai/projects/${selectedProject._id}/qa`, { headers }),
           fetch(`${BACKEND_URL}/api/ai/projects/${selectedProject._id}/slides`, { headers }),
-          fetch(`${BACKEND_URL}/api/ai/projects/${selectedProject._id}/summary`, { headers })
+          fetch(`${BACKEND_URL}/api/ai/summary/${selectedProject._id}`, { headers })
         ]);
 
         if (studyPlanRes.ok) {
           const data = await studyPlanRes.json();
           setStudyPlanContent({ content: data.content || [] });
+          setStudyPlanId(data._id);
         }
         if (flashcardsRes.ok) {
           const data = await flashcardsRes.json();
@@ -162,7 +163,7 @@ export default function StudyBuddyDashboard() {
         }
         if (summaryRes.ok) {
           const data = await summaryRes.json();
-          setSummaryContent(data);
+          setSummaryContent(data.data);
         }
       } catch (error) {
         console.error('Error fetching AI content:', error);
@@ -304,6 +305,8 @@ export default function StudyBuddyDashboard() {
         case 'study-plan':
           response = await axios.post(API_ROUTES.AI_GENERATE.STUDY_PLAN, payload, { headers });
           setStudyPlanContent(response.data.data);
+          
+          
           break;
         case 'flashcards':
           response = await axios.post(API_ROUTES.AI_GENERATE.FLASHCARDS, payload, { headers });
