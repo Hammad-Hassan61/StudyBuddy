@@ -598,13 +598,15 @@ export default function StudyBuddyDashboard() {
             >
               <X className="w-8 h-8" />
             </button>
-            <iframe
-              src={pdfUrlToView}
+            <object
+              data={pdfUrlToView}
+              type="application/pdf"
               width="100%"
               height="100%"
               className="rounded-lg"
-              title="PDF Viewer"
-            ></iframe>
+            >
+              <p>Unable to display PDF file. <a href={pdfUrlToView} target="_blank" rel="noopener noreferrer">Download</a> instead.</p>
+            </object>
           </div>
         </div>
       )}
