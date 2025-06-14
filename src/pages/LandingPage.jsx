@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { BookOpen, Clock, Brain, Zap, Upload, Users, Mic, FileText, Target, Lightbulb, ArrowRight } from 'lucide-react';
 import { FaGoogle } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
+import { BACKEND_URL } from '../services/api';
 
-const GOOGLE_AUTH_URL = "http://localhost:5000/api/auth/google";
+const GOOGLE_AUTH_URL = `${BACKEND_URL}/api/auth/google`;
 
 const StudyBuddyLanding = () => {
   const [isVisible, setIsVisible] = useState(false);
